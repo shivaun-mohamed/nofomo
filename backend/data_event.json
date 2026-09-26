@@ -1,12 +1,7 @@
 import json
 
-clubs = [
-    dict(id='club-data-lab', name='Campus Data Lab', category='Academic', socials=[dict(platform='Instagram', url='https://instagram.com/campusdatalab')]),
-    dict(id='club-trail-track', name='Trail & Track Collective', category='Athletic or Recreation', socials=[dict(platform='Instagram', url='https://instagram.com/trailtrackcollective')]),
-    dict(id='club-global-kitchen', name='Global Kitchen Exchange', category='Cultural or Identity', socials=[dict(platform='Instagram', url='https://instagram.com/globalkitchenexchange')]),
-    dict(id='club-makers-menders', name='Makers & Menders', category='Leisure or Hobby', socials=[dict(platform='Instagram', url='https://instagram.com/makersandmenders')]),
-    dict(id='club-offbeat-radio', name='Offbeat Campus Radio', category='Media or Performance', socials=[dict(platform='Instagram', url='https://instagram.com/offbeatcampusradio')]),
-]
+# TO-do: separate clubs and events into separate json files, separate tables in database, each event should map to a club
+# event needs foreign key to map to club
 
 events = [
     dict(
