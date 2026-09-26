@@ -1,0 +1,9 @@
+.add-event-form {
+  max-width: 600px;
+  margin: 24px auto;
+  padding: 24px;
+  background: white;
+  color: #172033;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+}
