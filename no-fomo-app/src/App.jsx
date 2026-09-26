@@ -7,6 +7,8 @@ import '@fullcalendar/react/themes/monarch/theme.css'; // YOUR THEME
 
 import './App.css'
 import data from "./data/data.json";
+import { useState } from "react";
+import EventModal from "./components 2/EventModal";
 
 function App() {
   const calendarEvents = data.events.map((event) => {
@@ -42,7 +44,9 @@ function App() {
             events={calendarEvents}
           />
         </div>
+        {selectedEvent && <EventModal event={selectedEvent} />}
       </section>
+      {/* <AddEventForm /> */}
     </main>
   )
 }
