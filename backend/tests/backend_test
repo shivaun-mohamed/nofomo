@@ -11,7 +11,7 @@ if str(BACKEND_DIR) not in sys.path:
 
 from edit_club import add_club, remove_club
 from edit_event import add_event, remove_event
-from filter import filter_clubs, filter_events
+from filter import attach_events_to_clubs, filter_clubs, filter_events
 
 
 with (BACKEND_DIR / 'data_club.json').open(encoding='utf-8') as file:
@@ -38,6 +38,15 @@ class BackendDataTests(unittest.TestCase):
 				for event in EVENTS
 			)
 		)
+
+	def test_events_are_attached_to_clubs_by_id(self):
+		clubs_with_events = attach_events_to_clubs(CLUBS, EVENTS)
+		events_by_club_id = {club['id']: club['events'] for club in clubs_with_events}
+		self.assertEqual(len(events_by_club_id['club-data-lab']), 2)
+		self.assertEqual(len(events_by_club_id['club-trail-track']), 2)
+		self.assertTrue(all('events' not in club for club in CLUBS))
+		with self.assertRaises(ValueError):
+			attach_events_to_clubs(CLUBS, [{'clubId': 'unknown-club'}])
 
 
 class ClubEditingTests(unittest.TestCase):
@@ -77,27 +86,29 @@ class ClubEditingTests(unittest.TestCase):
 
 
 class EventEditingTests(unittest.TestCase):
-	def test_add_and_remove_event(self):
-		events = []
-		event = {
-			'clubId': 'club-test',
-			'title': 'Test Event',
-			'startsAt': '2026-10-03T13:00:00-04:00',
-			'endsAt': '2026-10-03T15:00:00-04:00',
-			'location': 'Campus Hall',
-			'description': 'A test event',
-			'requirements': ['Bring a notebook'],
-			'deadlines': [{'label': 'Register', 'dateTime': '2026-10-02T17:00:00-04:00'}],
-			'priceCents': 500,
-			'isRecurring': False,
-		}
+	def test_add_and_remove_event_persist_to_json(self):
+		with tempfile.TemporaryDirectory() as directory:
+			data_file = Path(directory) / 'data_event.json'
+			data_file.write_text('[]', encoding='utf-8')
+			event = {
+				'clubId': 'club-test',
+				'title': 'Test Event',
+				'startsAt': '2026-10-03T13:00:00-04:00',
+				'endsAt': '2026-10-03T15:00:00-04:00',
+				'location': 'Campus Hall',
+				'description': 'A test event',
+				'requirements': ['Bring a notebook'],
+				'deadlines': [{'label': 'Register', 'dateTime': '2026-10-02T17:00:00-04:00'}],
+				'priceCents': 500,
+				'isRecurring': False,
+			}
 
-		added = add_event(events, event)
+		added = add_event(event, data_file)
 		self.assertTrue(added['id'])
-		self.assertEqual(events, [added])
-		self.assertEqual(remove_event(events, added['id']), added)
-		self.assertEqual(events, [])
-		self.assertIsNone(remove_event(events, 'missing-id'))
+		self.assertEqual(json.loads(data_file.read_text(encoding='utf-8')), [added])
+		self.assertEqual(remove_event(added['id'], data_file), added)
+		self.assertEqual(json.loads(data_file.read_text(encoding='utf-8')), [])
+		self.assertIsNone(remove_event('missing-id', data_file))
 
 	def test_add_event_rejects_invalid_time_and_duplicate_id(self):
 		event = {
@@ -113,12 +124,17 @@ class EventEditingTests(unittest.TestCase):
 			'priceCents': 0,
 			'isRecurring': False,
 		}
-		events = []
-		add_event(events, event)
-		with self.assertRaises(ValueError):
-			add_event(events, event)
-		with self.assertRaises(ValueError):
-			add_event([], {**event, 'id': 'event-invalid', 'endsAt': '2026-10-03T12:00:00-04:00'})
+		with tempfile.TemporaryDirectory() as directory:
+			data_file = Path(directory) / 'data_event.json'
+			data_file.write_text('[]', encoding='utf-8')
+			add_event(event, data_file)
+			with self.assertRaises(ValueError):
+				add_event(event, data_file)
+			with self.assertRaises(ValueError):
+				add_event(
+					{**event, 'id': 'event-invalid', 'endsAt': '2026-10-03T12:00:00-04:00'},
+					data_file,
+				)
 
 
 class FilterTests(unittest.TestCase):
