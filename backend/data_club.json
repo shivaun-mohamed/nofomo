@@ -1,0 +1,44 @@
+{
+    "clubs": [
+        {
+            "id": "club-data-lab",
+            "name": "Campus Data Lab",
+            "category": "Academic",
+            "socials": [
+                {"platform": "Instagram", "url": "https://instagram.com/campusdatalab"}
+            ]
+        },
+        {
+            "id": "club-trail-track",
+            "name": "Trail & Track Collective",
+            "category": "Athletic or Recreation",
+            "socials": [
+                {"platform": "Instagram", "url": "https://instagram.com/trailtrackcollective"}
+            ]
+        },
+        {
+            "id": "club-global-kitchen",
+            "name": "Global Kitchen Exchange",
+            "category": "Cultural or Identity",
+            "socials": [
+                {"platform": "Instagram", "url": "https://instagram.com/globalkitchenexchange"}
+            ]
+        },
+        {
+            "id": "club-makers-menders",
+            "name": "Makers & Menders",
+            "category": "Leisure or Hobby",
+            "socials": [
+                {"platform": "Instagram", "url": "https://instagram.com/makersandmenders"}
+            ]
+        },
+        {
+            "id": "club-offbeat-radio",
+            "name": "Offbeat Campus Radio",
+            "category": "Media or Performance",
+            "socials": [
+                {"platform": "Instagram", "url": "https://instagram.com/offbeatcampusradio"}
+            ]
+        }
+    ]
+}
