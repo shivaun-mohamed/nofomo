@@ -21,7 +21,7 @@ def _write_clubs(data_file, data):
 		file.write('\n')
 
 
-# allows user to add club to data.json, validation check for club data
+# allows user to add club to data_club.json, validation check for club data
 def add_club(club, data_file=DATA_FILE):
 	"""Validate and save a club; generate an ID if the club does not have one."""
 	if not isinstance(club, dict):
@@ -53,7 +53,7 @@ def add_club(club, data_file=DATA_FILE):
 	_write_clubs(data_file, data)
 	return new_club
 
-# allows user to remove club from data.json
+# allows user to remove club from data_club.json
 def remove_club(club_id, data_file=DATA_FILE):
 	"""Remove and return a club by ID, or return None when it is not found."""
 	data = _read_clubs(data_file)

@@ -77,27 +77,29 @@ class ClubEditingTests(unittest.TestCase):
 
 
 class EventEditingTests(unittest.TestCase):
-	def test_add_and_remove_event(self):
-		events = []
-		event = {
-			'clubId': 'club-test',
-			'title': 'Test Event',
-			'startsAt': '2026-10-03T13:00:00-04:00',
-			'endsAt': '2026-10-03T15:00:00-04:00',
-			'location': 'Campus Hall',
-			'description': 'A test event',
-			'requirements': ['Bring a notebook'],
-			'deadlines': [{'label': 'Register', 'dateTime': '2026-10-02T17:00:00-04:00'}],
-			'priceCents': 500,
-			'isRecurring': False,
-		}
+	def test_add_and_remove_event_persist_to_json(self):
+		with tempfile.TemporaryDirectory() as directory:
+			data_file = Path(directory) / 'data_event.json'
+			data_file.write_text('[]', encoding='utf-8')
+			event = {
+				'clubId': 'club-test',
+				'title': 'Test Event',
+				'startsAt': '2026-10-03T13:00:00-04:00',
+				'endsAt': '2026-10-03T15:00:00-04:00',
+				'location': 'Campus Hall',
+				'description': 'A test event',
+				'requirements': ['Bring a notebook'],
+				'deadlines': [{'label': 'Register', 'dateTime': '2026-10-02T17:00:00-04:00'}],
+				'priceCents': 500,
+				'isRecurring': False,
+			}
 
-		added = add_event(events, event)
+		added = add_event(event, data_file)
 		self.assertTrue(added['id'])
-		self.assertEqual(events, [added])
-		self.assertEqual(remove_event(events, added['id']), added)
-		self.assertEqual(events, [])
-		self.assertIsNone(remove_event(events, 'missing-id'))
+		self.assertEqual(json.loads(data_file.read_text(encoding='utf-8')), [added])
+		self.assertEqual(remove_event(added['id'], data_file), added)
+		self.assertEqual(json.loads(data_file.read_text(encoding='utf-8')), [])
+		self.assertIsNone(remove_event('missing-id', data_file))
 
 	def test_add_event_rejects_invalid_time_and_duplicate_id(self):
 		event = {
@@ -113,12 +115,17 @@ class EventEditingTests(unittest.TestCase):
 			'priceCents': 0,
 			'isRecurring': False,
 		}
-		events = []
-		add_event(events, event)
-		with self.assertRaises(ValueError):
-			add_event(events, event)
-		with self.assertRaises(ValueError):
-			add_event([], {**event, 'id': 'event-invalid', 'endsAt': '2026-10-03T12:00:00-04:00'})
+		with tempfile.TemporaryDirectory() as directory:
+			data_file = Path(directory) / 'data_event.json'
+			data_file.write_text('[]', encoding='utf-8')
+			add_event(event, data_file)
+			with self.assertRaises(ValueError):
+				add_event(event, data_file)
+			with self.assertRaises(ValueError):
+				add_event(
+					{**event, 'id': 'event-invalid', 'endsAt': '2026-10-03T12:00:00-04:00'},
+					data_file,
+				)
 
 
 class FilterTests(unittest.TestCase):
