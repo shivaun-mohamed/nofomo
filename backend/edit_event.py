@@ -33,8 +33,7 @@ def _write_events(data_file, events):
 		file.write('\n')
 
 
-def add_event(event, data_file=DATA_FILE):
-	"""Validate and save an event, generating an ID when one is not supplied."""
+def _prepare_event(event, event_id=None):
 	if not isinstance(event, dict):
 		raise ValueError('Event must be a dictionary')
 
@@ -44,7 +43,14 @@ def add_event(event, data_file=DATA_FILE):
 		raise ValueError(f'Missing required event fields: {missing}')
 
 	new_event = dict(event)
-	new_event.setdefault('id', str(uuid4()))
+	if event_id is None:
+		new_event.setdefault('id', str(uuid4()))
+	elif new_event.get('id', event_id) != event_id:
+		raise ValueError('Event id must match the id in the URL')
+	else:
+		new_event['id'] = event_id
+	if not isinstance(new_event['id'], str) or not new_event['id'].strip():
+		raise ValueError('Event id must be a non-empty string')
 
 	for field in ('title', 'clubId', 'location', 'description'):
 		if not isinstance(new_event[field], str) or not new_event[field].strip():
@@ -73,6 +79,12 @@ def add_event(event, data_file=DATA_FILE):
 
 	if starts_at.tzinfo is None or ends_at.tzinfo is None or ends_at <= starts_at:
 		raise ValueError('Event times must include a timezone and endsAt must be later than startsAt')
+	return new_event
+
+
+def add_event(event, data_file=DATA_FILE):
+	"""Validate and save an event, generating an ID when one is not supplied."""
+	new_event = _prepare_event(event)
 
 	events = _read_events(data_file)
 	if any(existing.get('id') == new_event['id'] for existing in events):
@@ -81,6 +93,22 @@ def add_event(event, data_file=DATA_FILE):
 	events.append(new_event)
 	_write_events(data_file, events)
 	return new_event
+
+
+def update_event(event_id, event, data_file=DATA_FILE):
+	"""Replace a saved event by ID, returning None if it does not exist."""
+	events = _read_events(data_file)
+	index = next(
+		(index for index, existing in enumerate(events) if existing.get('id') == event_id),
+		None,
+	)
+	if index is None:
+		return None
+
+	updated_event = _prepare_event(event, event_id)
+	events[index] = updated_event
+	_write_events(data_file, events)
+	return updated_event
 
 
 def remove_event(event_id, data_file=DATA_FILE):
@@ -93,4 +121,5 @@ def remove_event(event_id, data_file=DATA_FILE):
 	events.remove(event)
 	_write_events(data_file, events)
 	return event
+
 
