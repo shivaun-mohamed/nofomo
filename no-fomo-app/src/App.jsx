@@ -7,11 +7,8 @@ import '@fullcalendar/react/themes/monarch/theme.css'; // YOUR THEME
 
 import './App.css'
 import data from "./data/data.json";
-import { useState } from "react";
-import EventModal from "./components 2/EventModal";
 
 function App() {
-  const [selectedEvent, setSelectedEvent] = useState(null);
   const calendarEvents = data.events.map((event) => {
     return {
       id: event.id,
@@ -25,12 +22,12 @@ function App() {
     <main className="calendar-page">
       <section className="calendar-shell" aria-label="Calendar">
         <header className="calendar-intro">
+          <img className="brand-logo" src="/nomo-logo.svg" alt="nomo." />
           <p className="eyebrow">YOUR SCHEDULE</p>
           <h1>Calendar</h1>
           <p className="calendar-description">A clear view of what’s ahead.</p>
         </header>
         <div className="calendar-card">
-          {selectedEvent && <EventModal event={selectedEvent} />}
           <FullCalendar
             plugins={[themePlugin, dayGridPlugin]}
             initialView="dayGridMonth"
@@ -43,13 +40,6 @@ function App() {
             fixedWeekCount={false}
             dayMaxEvents={2}
             events={calendarEvents}
-            eventClick={(info) => {
-              const clickedEvent = data.events.find((event) =>
-                event.id === info.event.id
-              );
-
-              setSelectedEvent(clickedEvent);
-            }}
           />
         </div>
       </section>

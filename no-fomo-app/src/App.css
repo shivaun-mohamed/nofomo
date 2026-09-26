@@ -25,6 +25,13 @@
   margin: 0 0 28px;
 }
 
+.brand-logo {
+  display: block;
+  width: 148px;
+  height: auto;
+  margin: 0 0 28px -2px;
+}
+
 .eyebrow {
   margin: 0 0 8px;
   color: #858b98;
