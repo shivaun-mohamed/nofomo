@@ -6,7 +6,7 @@ from uuid import uuid4
 DATA_FILE = Path(__file__).with_name('data_club.json')
 REQUIRED_CLUB_FIELDS = {'name', 'category', 'socials'}
 
-
+# opens data_club.json, checks its a club list, and returns data
 def _read_clubs(data_file):
 	with Path(data_file).open('r', encoding='utf-8') as file:
 		data = json.load(file)
@@ -14,17 +14,18 @@ def _read_clubs(data_file):
 		raise ValueError("Club data must be a JSON object with a 'clubs' list")
 	return data
 
-
+# saves updated json data to data_club.json
 def _write_clubs(data_file, data):
 	with Path(data_file).open('w', encoding='utf-8') as file:
 		json.dump(data, file, indent=2, ensure_ascii=False)
 		file.write('\n')
 
 
+# allows user to add club to data.json, validation check for club data
 def add_club(club, data_file=DATA_FILE):
 	"""Validate and save a club; generate an ID if the club does not have one."""
 	if not isinstance(club, dict):
-		raise ValueError('Club must be a dictionary')
+		raise ValueError('Club must be a dictionary') # only takes in dictionaries
 
 	missing_fields = REQUIRED_CLUB_FIELDS - club.keys()
 	if missing_fields:
@@ -52,7 +53,7 @@ def add_club(club, data_file=DATA_FILE):
 	_write_clubs(data_file, data)
 	return new_club
 
-
+# allows user to remove club from data.json
 def remove_club(club_id, data_file=DATA_FILE):
 	"""Remove and return a club by ID, or return None when it is not found."""
 	data = _read_clubs(data_file)
