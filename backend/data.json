@@ -1,3 +1,5 @@
+import json
+
 clubs = [
     dict(id='club-data-lab', name='Campus Data Lab', category='Academic', socials=[dict(platform='Instagram', url='https://instagram.com/campusdatalab')]),
     dict(id='club-trail-track', name='Trail & Track Collective', category='Athletic or Recreation', socials=[dict(platform='Instagram', url='https://instagram.com/trailtrackcollective')]),
@@ -96,4 +98,5 @@ events = [
         priceCents=0, isRecurring=True,
     ),
 ]
+
 
