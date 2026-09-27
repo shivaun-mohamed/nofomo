@@ -265,7 +265,6 @@ function App() {
               <legend>Event type</legend>
               <label className="filter-option"><input type="checkbox" checked={filters.hasDeadline} onChange={(event) => setFilters((current) => ({ ...current, hasDeadline: event.target.checked }))} /><span>Has a deadline</span></label>
               <label className="filter-option"><input type="checkbox" checked={filters.foodSnacksOnly} onChange={(event) => setFilters((current) => ({ ...current, foodSnacksOnly: event.target.checked }))} /><span>Food/Snacks included</span></label>
-              <label className="filter-option"><input type="checkbox" checked={filters.foodSnacksOnly} onChange={(event) => setFilters((current) => ({ ...current, foodSnacksOnly: event.target.checked }))} /><span>Food/Snacks included</span></label>
               <label className="filter-option"><input type="radio" name="recurrence" checked={filters.recurrence === "all"} onChange={() => setFilters((current) => ({ ...current, recurrence: "all" }))} /><span>Any schedule</span></label>
               <label className="filter-option"><input type="radio" name="recurrence" checked={filters.recurrence === "recurring"} onChange={() => setFilters((current) => ({ ...current, recurrence: "recurring" }))} /><span>Recurring</span></label>
               <label className="filter-option"><input type="radio" name="recurrence" checked={filters.recurrence === "one-time"} onChange={() => setFilters((current) => ({ ...current, recurrence: "one-time" }))} /><span>One-time</span></label>
