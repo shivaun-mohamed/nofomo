@@ -1,5 +1,4 @@
 import "./EventModal.css";
-import data from "../data/data.json";
 
 function formatDateTime(dateTime) {
   if (!dateTime) return "Not provided";
@@ -18,8 +17,8 @@ function toGoogleCalendarDate(dateTime) {
   return new Date(dateTime).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 }
 
-function EventModal({ event, onClose }) {
-  const club = data.clubs.find((item) => event.clubId === item.id);
+function EventModal({ event, clubs, onClose }) {
+  const club = clubs.find((item) => event.clubId === item.id);
   const requirements = event.requirements || [];
   const deadlines = event.deadlines || [];
   const price = Number.isFinite(event.priceCents)

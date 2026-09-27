@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import themePlugin from "@fullcalendar/react/themes/monarch";
 import dayGridPlugin from "@fullcalendar/react/daygrid";
 import "@fullcalendar/react/skeleton.css";
 import "@fullcalendar/react/themes/monarch/theme.css";
 import "./App.css";
-import data from "./data/data.json";
 import EventModal from "./components2/EventModal";
 import ClubView from "./pages/ClubView";
 
@@ -18,7 +17,6 @@ const CATEGORIES = [
   "Media or Performance",
   "Other",
 ];
-const MAX_EVENT_COST = Math.ceil(Math.max(0, ...data.events.map((event) => event.priceCents || 0)) / 100);
 
 function FilterChoices({ title, group, options, filters, toggleFilter }) {
   return (
@@ -38,7 +36,60 @@ function App() {
   const [page, setPage] = useState("home");
   const [authMessage, setAuthMessage] = useState("");
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [filters, setFilters] = useState({ clubs: [], categories: [], maxCost: MAX_EVENT_COST, hasDeadline: false, foodSnacksOnly: false, recurrence: "all" });
+  const [data, setData] = useState({ clubs: [], events: [] });
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [filters, setFilters] = useState({ clubs: [], categories: [], maxCost: 0, hasDeadline: false, foodSnacksOnly: false, recurrence: "all" });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadData() {
+      try {
+        const [clubsResponse, eventsResponse] = await Promise.all([
+          fetch("http://127.0.0.1:5000/api/clubs"),
+          fetch("http://127.0.0.1:5000/api/events"),
+        ]);
+
+        if (!clubsResponse.ok || !eventsResponse.ok) {
+          throw new Error("Could not load clubs and events from the backend.");
+        }
+
+        const [clubs, calendarEvents] = await Promise.all([
+          clubsResponse.json(),
+          eventsResponse.json(),
+        ]);
+        const events = calendarEvents.map(({ id, title, start, end, extendedProps = {} }) => ({
+          ...extendedProps,
+          id,
+          title,
+          startsAt: start,
+          endsAt: end,
+        }));
+
+        if (cancelled) return;
+
+        setData({ clubs, events });
+        const maxCost = Math.ceil(
+          Math.max(0, ...events.map((event) => event.priceCents || 0)) / 100
+        );
+        setFilters((current) => ({ ...current, maxCost }));
+      } catch (error) {
+        if (!cancelled) setLoadError(error.message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    loadData();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const maxEventCost = Math.ceil(
+    Math.max(0, ...data.events.map((event) => event.priceCents || 0)) / 100
+  );
   const clubs = data.clubs;
   const clubById = Object.fromEntries(clubs.map((club) => [club.id, club]));
   const calendarEvents = data.events.map((event) => {
@@ -145,7 +196,7 @@ function App() {
           <aside className="filter-sidebar" aria-label="Filter events">
             <div className="filter-heading">
               <div><p className="eyebrow">MAKE IT YOURS</p><h2>Filters</h2></div>
-              <button className="clear-filters" onClick={() => setFilters({ clubs: [], categories: [], maxCost: MAX_EVENT_COST, hasDeadline: false, foodSnacksOnly: false, recurrence: "all" })}>Clear</button>
+              <button className="clear-filters" onClick={() => setFilters({ clubs: [], categories: [], maxCost: maxEventCost, hasDeadline: false, foodSnacksOnly: false, recurrence: "all" })}>Clear</button>
             </div>
             <p className="filter-count">{visibleEvents.length} of {calendarEvents.length} events</p>
             <FilterChoices title="Clubs" group="clubs" options={clubs.map((club) => ({ value: club.id, label: club.name }))} filters={filters} toggleFilter={toggleFilter} />
@@ -153,12 +204,13 @@ function App() {
             <fieldset className="filter-group">
               <legend>Entry price</legend>
               <label className="price-filter-label" htmlFor="max-entry-price">Up to <strong>${filters.maxCost}</strong></label>
-              <input id="max-entry-price" className="price-slider" type="range" min="0" max={MAX_EVENT_COST} step="1" value={filters.maxCost} onChange={(event) => setFilters((current) => ({ ...current, maxCost: Number(event.target.value) }))} />
-              <div className="price-slider-labels"><span>Free</span><span>${MAX_EVENT_COST}</span></div>
+              <input id="max-entry-price" className="price-slider" type="range" min="0" max={maxEventCost} step="1" value={filters.maxCost} onChange={(event) => setFilters((current) => ({ ...current, maxCost: Number(event.target.value) }))} />
+              <div className="price-slider-labels"><span>Free</span><span>${maxEventCost}</span></div>
             </fieldset>
             <fieldset className="filter-group">
               <legend>Event type</legend>
               <label className="filter-option"><input type="checkbox" checked={filters.hasDeadline} onChange={(event) => setFilters((current) => ({ ...current, hasDeadline: event.target.checked }))} /><span>Has a deadline</span></label>
+              <label className="filter-option"><input type="checkbox" checked={filters.foodSnacksOnly} onChange={(event) => setFilters((current) => ({ ...current, foodSnacksOnly: event.target.checked }))} /><span>Food/Snacks included</span></label>
               <label className="filter-option"><input type="checkbox" checked={filters.foodSnacksOnly} onChange={(event) => setFilters((current) => ({ ...current, foodSnacksOnly: event.target.checked }))} /><span>Food/Snacks included</span></label>
               <label className="filter-option"><input type="radio" name="recurrence" checked={filters.recurrence === "all"} onChange={() => setFilters((current) => ({ ...current, recurrence: "all" }))} /><span>Any schedule</span></label>
               <label className="filter-option"><input type="radio" name="recurrence" checked={filters.recurrence === "recurring"} onChange={() => setFilters((current) => ({ ...current, recurrence: "recurring" }))} /><span>Recurring</span></label>
@@ -166,6 +218,8 @@ function App() {
             </fieldset>
           </aside>
           <div className="calendar-card">
+            {loading && <p role="status">Loading clubs and events...</p>}
+            {loadError && <p role="alert">{loadError}</p>}
             <FullCalendar
               plugins={[themePlugin, dayGridPlugin]}
               initialView="dayGridMonth"
@@ -184,6 +238,7 @@ function App() {
         {selectedEvent && (
           <EventModal
             event={selectedEvent}
+            clubs={clubs}
             onClose={() => setSelectedEvent(null)}
           />
         )}
