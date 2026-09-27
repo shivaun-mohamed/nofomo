@@ -7,7 +7,7 @@ import "@fullcalendar/react/themes/monarch/theme.css";
 import "./App.css";
 import data from "./data/data.json";
 import EventModal from "./components2/EventModal";
-
+import ClubView from "./pages/ClubView";
 
 const CATEGORIES = [
   "Academic",
@@ -79,7 +79,21 @@ function App() {
             <p className="welcome-description">
               Discover what’s happening at UBC. NOMO brings club events together in one easy-to-browse calendar, so you can find your people and make plans.
             </p>
-            <button className="primary-button home-continue" onClick={() => setPage("access")}>Continue <span aria-hidden="true">→</span></button>
+            <div className="home-options">
+  <button
+    className="primary-button home-continue"
+    onClick={() => setPage("access")}
+  >
+    Continue as student <span aria-hidden="true">→</span>
+  </button>
+
+  <button
+    className="primary-button home-continue"
+    onClick={() => setPage("club")}
+  >
+    Continue as club <span aria-hidden="true">→</span>
+  </button>
+</div>
           </section>
           <footer className="welcome-footer">A little less scrolling. A lot more showing up.</footer>
         </div>
@@ -110,6 +124,10 @@ function App() {
       </main>
     );
   }
+
+  if (page === "club") {
+  return <ClubView />;
+}
 
   return (
     <main className="calendar-page">
