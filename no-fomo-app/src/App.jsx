@@ -122,6 +122,10 @@ function App() {
 
   async function removeEvent(eventId) {
     const response = await fetch(`/api/events/${encodeURIComponent(eventId)}`, { method: "DELETE" });
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+      throw new Error("The backend returned an unexpected response. Make sure the Flask server is running and restart it after backend changes.");
+    }
     const result = await response.json();
     if (!response.ok) {
       throw new Error(result.error || "Could not remove the event.");
