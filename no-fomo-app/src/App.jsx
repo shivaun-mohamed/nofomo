@@ -6,6 +6,8 @@ import "@fullcalendar/react/skeleton.css";
 import "@fullcalendar/react/themes/monarch/theme.css";
 import "./App.css";
 import data from "./data/data.json";
+import EventModal from "./components2/EventModal";
+
 
 const CATEGORIES = [
   "Academic",
@@ -35,6 +37,7 @@ function FilterChoices({ title, group, options, filters, toggleFilter }) {
 function App() {
   const [page, setPage] = useState("home");
   const [authMessage, setAuthMessage] = useState("");
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const [filters, setFilters] = useState({ clubs: [], categories: [], maxCost: MAX_EVENT_COST, hasDeadline: false, recurrence: "all" });
   const clubs = data.clubs;
   const clubById = Object.fromEntries(clubs.map((club) => [club.id, club]));
@@ -151,10 +154,19 @@ function App() {
               fixedWeekCount={false}
               dayMaxEvents={2}
               events={visibleEvents}
+              eventClick={(info) => {
+                const clickedEvent = data.events.find((event) => event.id === info.event.id);
+                setSelectedEvent(clickedEvent);
+              }}
             />
           </div>
         </div>
-        <button className="back-button calendar-back" onClick={() => setPage("access")}>← Back</button>
+        {selectedEvent && (
+          <EventModal
+            event={selectedEvent}
+            onClose={() => setSelectedEvent(null)}
+          />
+        )}
       </section>
     </main>
   );
