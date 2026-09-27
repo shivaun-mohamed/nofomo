@@ -68,7 +68,6 @@ function App() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [data, setData] = useState({ clubs: [], events: [] });
   const [loading, setLoading] = useState(true);
-  const [loadNotice, setLoadNotice] = useState("");
   const [filters, setFilters] = useState({ clubs: [], categories: [], maxCost: 0, hasDeadline: false, foodSnacksOnly: false, recurrence: "all" });
 
   useEffect(() => {
@@ -85,14 +84,12 @@ function App() {
         setData(nextData);
         const maxCost = getMaxEventCost(nextData.events);
         setFilters((current) => ({ ...current, maxCost }));
-        setLoadNotice("");
       } catch (error) {
         if (!cancelled) {
           if (!loadedFromBackend) {
             setData(fallbackData);
             setFilters((current) => ({ ...current, maxCost: getMaxEventCost(fallbackData.events) }));
           }
-          setLoadNotice("Could not reach the shared backend. Check that the server is running and the devices are on the same network.");
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -121,7 +118,6 @@ function App() {
     const nextData = await fetchBackendData();
     setData(nextData);
     setFilters((current) => ({ ...current, maxCost: getMaxEventCost(nextData.events) }));
-    setLoadNotice("");
   }
 
   const maxEventCost = Math.ceil(
@@ -263,7 +259,6 @@ function App() {
           </aside>
           <div className="calendar-card">
             {loading && <p role="status">Loading clubs and events...</p>}
-            {loadNotice && <p className="calendar-data-notice" role="status">{loadNotice}</p>}
             <FullCalendar
               plugins={[themePlugin, dayGridPlugin]}
               initialView="dayGridMonth"

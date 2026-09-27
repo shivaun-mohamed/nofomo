@@ -52,7 +52,6 @@
 .calendar-intro { margin: 0 0 28px; }.calendar-intro .brand-logo { margin: 0 0 28px -2px; }
 .calendar-intro h1 { margin: 0; color: #20232b; font-size: clamp(28px, 4vw, 36px); font-weight: 600; letter-spacing: -.045em; line-height: 1.15; }
 .calendar-description { margin-top: 8px; color: #777e8b; font-size: 14px; }
-.calendar-data-notice { margin-bottom: 12px; padding: 10px 12px; border: 1px solid #ead7b7; border-radius: 7px; background: #fff9ed; color: #7a6340; font-size: 12px; line-height: 1.5; }
 .calendar-card { overflow: hidden; padding: clamp(16px, 3vw, 30px); border: 1px solid #e7e9ee; border-radius: 14px; background: #fff; box-shadow: 0 8px 28px rgb(27 36 56 / 4%); }
 .calendar-layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); align-items: start; gap: 18px; }
 .filter-sidebar { max-height: min(740px, calc(100svh - 210px)); overflow-y: auto; padding: 19px 17px; border: 1px solid #e7e9ee; border-radius: 12px; background: #fff; box-shadow: 0 8px 28px rgb(27 36 56 / 3%); scrollbar-color: #d6d8dc transparent; scrollbar-width: thin; }
