@@ -11,8 +11,6 @@ if str(BACKEND_DIR) not in sys.path:
 
 from edit_club import add_club, remove_club
 from edit_event import add_event, remove_event
-from filter import attach_events_to_clubs, filter_clubs, filter_events
-
 
 with (BACKEND_DIR / 'data_club.json').open(encoding='utf-8') as file:
 	CLUBS = json.load(file)['clubs']
