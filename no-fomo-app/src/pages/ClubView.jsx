@@ -1,3 +1,4 @@
+import { useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import themePlugin from "@fullcalendar/react/themes/monarch";
 import dayGridPlugin from "@fullcalendar/react/daygrid";
@@ -8,8 +9,12 @@ import "@fullcalendar/react/themes/monarch/theme.css";
 import AddEventForm from "../components/AddEventForm";
 import "./ClubView.css";
 
-function ClubView({ currentClub, events, onAddEvent, onGoHome }) {
-  const activeClubId = currentClub?.id;
+function ClubView({ clubs, events, onAddEvent, onGoHome }) {
+  const [selectedClubId, setSelectedClubId] = useState("");
+  const activeClubId = clubs.some((club) => club.id === selectedClubId)
+    ? selectedClubId
+    : clubs[0]?.id || "";
+  const activeClub = clubs.find((club) => club.id === activeClubId);
   const calendarEvents = events
     .filter((event) => event.clubId === activeClubId)
     .map((event) => ({
@@ -36,7 +41,7 @@ function ClubView({ currentClub, events, onAddEvent, onGoHome }) {
           className="club-view__calendar"
           aria-label="Club event calendar"
         >
-          <h2>{currentClub ? `${currentClub.name} calendar` : "Club calendar"}</h2>
+          <h2>{activeClub ? `${activeClub.name} calendar` : "Club calendar"}</h2>
 
           <FullCalendar
             plugins={[themePlugin, dayGridPlugin]}
@@ -55,7 +60,9 @@ function ClubView({ currentClub, events, onAddEvent, onGoHome }) {
 
         <div className="club-view__form">
           <AddEventForm
-            club={currentClub}
+            clubs={clubs}
+            selectedClubId={activeClubId}
+            onClubChange={setSelectedClubId}
             onAddEvent={onAddEvent}
           />
         </div>
