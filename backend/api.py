@@ -32,7 +32,7 @@ def add_cors_headers(response):
 	return response
 
 
-@app.get('/api/clubs')
+@app.route('/api/clubs', methods=['GET'])
 def get_clubs():
 	data = _read_json(CLUBS_FILE)
 	clubs = data.get('clubs') if isinstance(data, dict) else None
@@ -41,7 +41,7 @@ def get_clubs():
 	return jsonify(clubs)
 
 
-@app.get('/api/events')
+@app.route('/api/events', methods=['GET'])
 def get_events():
 	events = _read_json(EVENTS_FILE)
 	if not isinstance(events, list):
@@ -70,7 +70,7 @@ def _club_exists(club_id):
 	return isinstance(clubs, list) and any(club.get('id') == club_id for club in clubs)
 
 
-@app.post('/api/events')
+@app.route('/api/events', methods=['POST'])
 def create_event():
 	event = request.get_json(silent=True)
 	if not isinstance(event, dict):
@@ -85,7 +85,7 @@ def create_event():
 	return jsonify(_to_calendar_event(created_event)), 201
 
 
-@app.put('/api/events/<event_id>')
+@app.route('/api/events/<event_id>', methods=['PUT'])
 def replace_event(event_id):
 	event = request.get_json(silent=True)
 	if not isinstance(event, dict):
