@@ -64,7 +64,6 @@ function FilterChoices({ title, group, options, filters, toggleFilter }) {
 
 function App() {
   const [page, setPage] = useState("home");
-  const [authMessage, setAuthMessage] = useState("");
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [data, setData] = useState({ clubs: [], events: [] });
   const [loading, setLoading] = useState(true);
@@ -183,7 +182,7 @@ function App() {
             <div className="home-options">
   <button
     className="primary-button home-continue"
-    onClick={() => setPage("access")}
+    onClick={() => setPage("calendar")}
   >
     Continue as student <span aria-hidden="true">→</span>
   </button>
@@ -199,29 +198,6 @@ function App() {
           <footer className="welcome-footer">A little less scrolling. A lot more showing up.</footer>
         </div>
         <div className="welcome-art" aria-hidden="true"><div className="art-orbit orbit-one" /><div className="art-orbit orbit-two" /><div className="art-center">n<span>o</span>mo<span className="art-dot">.</span></div><div className="art-note note-top">find your next thing</div><div className="art-note note-bottom">see you there ↗</div></div>
-      </main>
-    );
-  }
-
-  if (page === "access") {
-    return (
-      <main className="access-page">
-        <section className="access-card">
-          <button className="logo-home-button" onClick={() => { setPage("home"); setAuthMessage(""); }} aria-label="Go to home page">
-            <img className="brand-logo" src="/nomo-logo.svg" alt="nomo." />
-          </button>
-          <p className="eyebrow">WELCOME TO NOMO</p>
-          <h1>Find your people.<br />Show up to something.</h1>
-          <p className="access-description">Sign in to get started, or explore the UBC calendar as a guest.</p>
-          <div className="login-options">
-            <button className="login-button" onClick={() => setAuthMessage("Google sign-in isn’t connected yet. Continue as a guest to explore the calendar.")}><span className="google-mark" aria-hidden="true">G</span>Continue with Google</button>
-            <button className="login-button" onClick={() => setAuthMessage("Apple sign-in isn’t connected yet. Continue as a guest to explore the calendar.")}><span className="apple-mark" aria-hidden="true">●</span>Continue with Apple</button>
-            <div className="option-divider"><span>OR</span></div>
-            <button className="primary-button guest-button" onClick={() => setPage("calendar")}>Continue as guest <span aria-hidden="true">→</span></button>
-          </div>
-          {authMessage && <p className="auth-message" role="status">{authMessage}</p>}
-          <button className="back-button" onClick={() => { setPage("home"); setAuthMessage(""); }}>← Back</button>
-        </section>
       </main>
     );
   }
