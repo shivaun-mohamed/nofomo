@@ -1,24 +1,16 @@
 import { useState } from "react";
 import "./AddEventForm.css";
 
-const categories = [
-  "Academic",
-  "Athletic or Recreation",
-  "Cultural or Identity",
-  "Leisure or Hobby",
-  "Media or Performance",
-  "Other",
-];
-
 function toIsoDateTime(value) {
   return new Date(value).toISOString();
 }
 
-function AddEventForm({ onAddEvent }) {
+function AddEventForm({ clubs, selectedClubId, onClubChange, onAddEvent }) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(submitEvent) {
+  async function handleSubmit(submitEvent) {
     submitEvent.preventDefault();
     setMessage("");
     setError("");
@@ -36,9 +28,8 @@ function AddEventForm({ onAddEvent }) {
     const deadline = formData.get("registrationDeadline");
     const title = formData.get("title").trim();
     const event = {
-      id: globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      clubId: selectedClubId,
       title,
-      category: formData.get("category"),
       startsAt: toIsoDateTime(startsAt),
       endsAt: toIsoDateTime(endsAt),
       location: formData.get("location").trim(),
@@ -55,9 +46,16 @@ function AddEventForm({ onAddEvent }) {
       foodSnacksIncluded: formData.has("foodSnacksIncluded"),
     };
 
-    onAddEvent(event);
-    form.reset();
-    setMessage(`“${title}” was added to the calendar.`);
+    setIsSubmitting(true);
+    try {
+      await onAddEvent(event);
+      form.reset();
+      setMessage(`“${title}” was saved and shared.`);
+    } catch (submitError) {
+      setError(submitError.message || "Could not save the event. Try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -72,9 +70,15 @@ function AddEventForm({ onAddEvent }) {
         </label>
 
         <label className="add-event-form__field">
-          Category
-          <select name="category" defaultValue="Academic" required>
-            {categories.map((category) => <option key={category} value={category}>{category}</option>)}
+          Club
+          <select
+            name="clubId"
+            value={selectedClubId}
+            onChange={(event) => onClubChange(event.target.value)}
+            required
+            disabled={!clubs.length || isSubmitting}
+          >
+            {clubs.map((club) => <option key={club.id} value={club.id}>{club.name}</option>)}
           </select>
         </label>
 
@@ -127,7 +131,9 @@ function AddEventForm({ onAddEvent }) {
 
         {error && <p className="add-event-form__error" role="alert">{error}</p>}
         {message && <p className="add-event-form__message" role="status">{message}</p>}
-        <button className="add-event-form__submit" type="submit">Add event</button>
+        <button className="add-event-form__submit" type="submit" disabled={isSubmitting || !clubs.length}>
+          {isSubmitting ? "Saving…" : "Add event"}
+        </button>
       </form>
     </section>
   );

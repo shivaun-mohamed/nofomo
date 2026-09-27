@@ -19,6 +19,35 @@ const CATEGORIES = [
   "Other",
 ];
 
+async function fetchBackendData() {
+  const [clubsResponse, eventsResponse] = await Promise.all([
+    fetch("/api/clubs"),
+    fetch("/api/events"),
+  ]);
+
+  if (!clubsResponse.ok || !eventsResponse.ok) {
+    throw new Error("Could not load clubs and events from the backend.");
+  }
+
+  const [clubs, calendarEvents] = await Promise.all([
+    clubsResponse.json(),
+    eventsResponse.json(),
+  ]);
+  const events = calendarEvents.map(({ id, title, start, end, extendedProps = {} }) => ({
+    ...extendedProps,
+    id,
+    title,
+    startsAt: start,
+    endsAt: end,
+  }));
+
+  return { clubs, events };
+}
+
+function getMaxEventCost(events) {
+  return Math.ceil(Math.max(0, ...events.map((event) => event.priceCents || 0)) / 100);
+}
+
 function FilterChoices({ title, group, options, filters, toggleFilter }) {
   return (
     <fieldset className="filter-group">
@@ -44,45 +73,26 @@ function App() {
 
   useEffect(() => {
     let cancelled = false;
+    let loadedFromBackend = false;
 
     async function loadData() {
       try {
-        const [clubsResponse, eventsResponse] = await Promise.all([
-          fetch("/api/clubs"),
-          fetch("/api/events"),
-        ]);
-
-        if (!clubsResponse.ok || !eventsResponse.ok) {
-          throw new Error("Could not load clubs and events from the backend.");
-        }
-
-        const [clubs, calendarEvents] = await Promise.all([
-          clubsResponse.json(),
-          eventsResponse.json(),
-        ]);
-        const events = calendarEvents.map(({ id, title, start, end, extendedProps = {} }) => ({
-          ...extendedProps,
-          id,
-          title,
-          startsAt: start,
-          endsAt: end,
-        }));
+        const nextData = await fetchBackendData();
 
         if (cancelled) return;
 
-        setData({ clubs, events });
-        const maxCost = Math.ceil(
-          Math.max(0, ...events.map((event) => event.priceCents || 0)) / 100
-        );
+        loadedFromBackend = true;
+        setData(nextData);
+        const maxCost = getMaxEventCost(nextData.events);
         setFilters((current) => ({ ...current, maxCost }));
+        setLoadNotice("");
       } catch (error) {
         if (!cancelled) {
-          setData(fallbackData);
-          const maxCost = Math.ceil(
-            Math.max(0, ...fallbackData.events.map((event) => event.priceCents || 0)) / 100
-          );
-          setFilters((current) => ({ ...current, maxCost }));
-          setLoadNotice("Showing saved events. Start the backend to load the latest club updates.");
+          if (!loadedFromBackend) {
+            setData(fallbackData);
+            setFilters((current) => ({ ...current, maxCost: getMaxEventCost(fallbackData.events) }));
+          }
+          setLoadNotice("Could not reach the shared backend. Check that the server is running and the devices are on the same network.");
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -90,10 +100,29 @@ function App() {
     }
 
     loadData();
+    const intervalId = window.setInterval(loadData, 10000);
     return () => {
       cancelled = true;
+      window.clearInterval(intervalId);
     };
   }, []);
+
+  async function createEvent(event) {
+    const response = await fetch("/api/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(event),
+    });
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error || "Could not save the event.");
+    }
+
+    const nextData = await fetchBackendData();
+    setData(nextData);
+    setFilters((current) => ({ ...current, maxCost: getMaxEventCost(nextData.events) }));
+    setLoadNotice("");
+  }
 
   const maxEventCost = Math.ceil(
     Math.max(0, ...data.events.map((event) => event.priceCents || 0)) / 100
@@ -186,7 +215,14 @@ function App() {
   }
 
   if (page === "club") {
-  return <ClubView onGoHome={() => setPage("home")} />;
+    return (
+      <ClubView
+        clubs={clubs}
+        events={data.events}
+        onAddEvent={createEvent}
+        onGoHome={() => setPage("home")}
+      />
+    );
 }
 
   return (
