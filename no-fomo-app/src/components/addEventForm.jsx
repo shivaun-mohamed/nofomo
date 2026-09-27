@@ -5,7 +5,7 @@ function toIsoDateTime(value) {
   return new Date(value).toISOString();
 }
 
-function AddEventForm({ clubs, selectedClubId, onClubChange, onAddEvent }) {
+function AddEventForm({ club, onAddEvent }) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -14,6 +14,11 @@ function AddEventForm({ clubs, selectedClubId, onClubChange, onAddEvent }) {
     submitEvent.preventDefault();
     setMessage("");
     setError("");
+
+    if (!club?.id) {
+      setError("Your club must be loaded before adding an event.");
+      return;
+    }
 
     const form = submitEvent.currentTarget;
     const formData = new FormData(form);
@@ -28,7 +33,7 @@ function AddEventForm({ clubs, selectedClubId, onClubChange, onAddEvent }) {
     const deadline = formData.get("registrationDeadline");
     const title = formData.get("title").trim();
     const event = {
-      clubId: selectedClubId,
+      clubId: club.id,
       title,
       startsAt: toIsoDateTime(startsAt),
       endsAt: toIsoDateTime(endsAt),
@@ -71,15 +76,11 @@ function AddEventForm({ clubs, selectedClubId, onClubChange, onAddEvent }) {
 
         <label className="add-event-form__field">
           Club
-          <select
-            name="clubId"
-            value={selectedClubId}
-            onChange={(event) => onClubChange(event.target.value)}
-            required
-            disabled={!clubs.length || isSubmitting}
-          >
-            {clubs.map((club) => <option key={club.id} value={club.id}>{club.name}</option>)}
-          </select>
+          <input
+            type="text"
+            value={club?.name || "Club unavailable"}
+            readOnly
+          />
         </label>
 
         <div className="add-event-form__field-grid">
@@ -131,7 +132,7 @@ function AddEventForm({ clubs, selectedClubId, onClubChange, onAddEvent }) {
 
         {error && <p className="add-event-form__error" role="alert">{error}</p>}
         {message && <p className="add-event-form__message" role="status">{message}</p>}
-        <button className="add-event-form__submit" type="submit" disabled={isSubmitting || !clubs.length}>
+        <button className="add-event-form__submit" type="submit" disabled={isSubmitting || !club?.id}>
           {isSubmitting ? "Saving…" : "Add event"}
         </button>
       </form>

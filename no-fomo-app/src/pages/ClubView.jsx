@@ -1,4 +1,3 @@
-import { useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import themePlugin from "@fullcalendar/react/themes/monarch";
 import dayGridPlugin from "@fullcalendar/react/daygrid";
@@ -7,16 +6,10 @@ import "@fullcalendar/react/skeleton.css";
 import "@fullcalendar/react/themes/monarch/theme.css";
 
 import AddEventForm from "../components/AddEventForm";
-import EventModal from "../components2/EventModal";
 import "./ClubView.css";
 
-function ClubView({ clubs, events, onAddEvent, onRemoveEvent, onGoHome }) {
-  const [selectedClubId, setSelectedClubId] = useState("");
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const activeClubId = clubs.some((club) => club.id === selectedClubId)
-    ? selectedClubId
-    : clubs[0]?.id || "";
-  const activeClub = clubs.find((club) => club.id === activeClubId);
+function ClubView({ currentClub, events, onAddEvent, onGoHome }) {
+  const activeClubId = currentClub?.id;
   const calendarEvents = events
     .filter((event) => event.clubId === activeClubId)
     .map((event) => ({
@@ -43,7 +36,7 @@ function ClubView({ clubs, events, onAddEvent, onRemoveEvent, onGoHome }) {
           className="club-view__calendar"
           aria-label="Club event calendar"
         >
-          <h2>{activeClub ? `${activeClub.name} calendar` : "Club calendar"}</h2>
+          <h2>{currentClub ? `${currentClub.name} calendar` : "Club calendar"}</h2>
 
           <FullCalendar
             plugins={[themePlugin, dayGridPlugin]}
@@ -57,34 +50,18 @@ function ClubView({ clubs, events, onAddEvent, onRemoveEvent, onGoHome }) {
             fixedWeekCount={false}
             dayMaxEvents={2}
             events={calendarEvents}
-            eventClick={(info) => {
-              const clickedEvent = events.find((event) => event.id === info.event.id);
-              if (clickedEvent) setSelectedEvent(clickedEvent);
-            }}
           />
         </section>
 
         <div className="club-view__form">
           <AddEventForm
-            clubs={clubs}
-            selectedClubId={activeClubId}
-            onClubChange={setSelectedClubId}
+            club={currentClub}
             onAddEvent={onAddEvent}
           />
         </div>
       </div>
-      {selectedEvent && (
-        <EventModal
-          event={selectedEvent}
-          clubs={clubs}
-          onClose={() => setSelectedEvent(null)}
-          onRemoveEvent={onRemoveEvent}
-        />
-      )}
     </main>
   );
 }
-
-
 
 export default ClubView;
