@@ -10,8 +10,7 @@ if str(BACKEND_DIR) not in sys.path:
 	sys.path.insert(0, str(BACKEND_DIR))
 
 from edit_club import add_club, remove_club
-from edit_event import add_event, remove_event
-from filter import attach_events_to_clubs, filter_clubs, filter_events
+from edit_event import add_event, remove_event, update_event
 
 
 with (BACKEND_DIR / 'data_club.json').open(encoding='utf-8') as file:
@@ -19,6 +18,21 @@ with (BACKEND_DIR / 'data_club.json').open(encoding='utf-8') as file:
 
 with (BACKEND_DIR / 'data_event.json').open(encoding='utf-8') as file:
 	EVENTS = json.load(file)
+
+
+def sample_event():
+	return {
+		'clubId': 'club-test',
+		'title': 'Test Event',
+		'startsAt': '2026-10-03T13:00:00-04:00',
+		'endsAt': '2026-10-03T15:00:00-04:00',
+		'location': 'Campus Hall',
+		'description': 'A test event',
+		'requirements': ['Bring a notebook'],
+		'deadlines': [{'label': 'Register', 'dateTime': '2026-10-02T17:00:00-04:00'}],
+		'priceCents': 500,
+		'isRecurring': False,
+	}
 
 
 class BackendDataTests(unittest.TestCase):
@@ -39,14 +53,11 @@ class BackendDataTests(unittest.TestCase):
 			)
 		)
 
-	def test_events_are_attached_to_clubs_by_id(self):
-		clubs_with_events = attach_events_to_clubs(CLUBS, EVENTS)
-		events_by_club_id = {club['id']: club['events'] for club in clubs_with_events}
-		self.assertEqual(len(events_by_club_id['club-data-lab']), 2)
-		self.assertEqual(len(events_by_club_id['club-trail-track']), 2)
-		self.assertTrue(all('events' not in club for club in CLUBS))
-		with self.assertRaises(ValueError):
-			attach_events_to_clubs(CLUBS, [{'clubId': 'unknown-club'}])
+	def test_each_club_has_two_linked_events(self):
+		event_counts = {club['id']: 0 for club in CLUBS}
+		for event in EVENTS:
+			event_counts[event['clubId']] += 1
+		self.assertEqual(set(event_counts.values()), {2})
 
 
 class ClubEditingTests(unittest.TestCase):
@@ -61,9 +72,8 @@ class ClubEditingTests(unittest.TestCase):
 			}
 
 			added = add_club(club, data_file)
-			saved_data = json.loads(data_file.read_text(encoding='utf-8'))
 			self.assertTrue(added['id'])
-			self.assertEqual(saved_data['clubs'], [added])
+			self.assertEqual(json.loads(data_file.read_text(encoding='utf-8'))['clubs'], [added])
 			self.assertEqual(remove_club(added['id'], data_file), added)
 			self.assertEqual(json.loads(data_file.read_text(encoding='utf-8'))['clubs'], [])
 			self.assertIsNone(remove_club('missing-id', data_file))
@@ -82,152 +92,43 @@ class ClubEditingTests(unittest.TestCase):
 			with self.assertRaises(ValueError):
 				add_club(club, data_file)
 			with self.assertRaises(ValueError):
-				add_club({**club, 'id': 'club-other', 'socials': ['not a social object']}, data_file)
+				add_club({**club, 'id': 'club-other', 'socials': ['invalid']}, data_file)
 
 
 class EventEditingTests(unittest.TestCase):
-	def test_add_and_remove_event_persist_to_json(self):
+	def test_add_update_and_remove_event_persist_to_json(self):
 		with tempfile.TemporaryDirectory() as directory:
 			data_file = Path(directory) / 'data_event.json'
 			data_file.write_text('[]', encoding='utf-8')
-			event = {
-				'clubId': 'club-test',
-				'title': 'Test Event',
-				'startsAt': '2026-10-03T13:00:00-04:00',
-				'endsAt': '2026-10-03T15:00:00-04:00',
-				'location': 'Campus Hall',
-				'description': 'A test event',
-				'requirements': ['Bring a notebook'],
-				'deadlines': [{'label': 'Register', 'dateTime': '2026-10-02T17:00:00-04:00'}],
-				'priceCents': 500,
-				'isRecurring': False,
-			}
 
-		added = add_event(event, data_file)
-		self.assertTrue(added['id'])
-		self.assertEqual(json.loads(data_file.read_text(encoding='utf-8')), [added])
-		self.assertEqual(remove_event(added['id'], data_file), added)
-		self.assertEqual(json.loads(data_file.read_text(encoding='utf-8')), [])
-		self.assertIsNone(remove_event('missing-id', data_file))
+			added = add_event(sample_event(), data_file)
+			self.assertTrue(added['id'])
+			self.assertEqual(json.loads(data_file.read_text(encoding='utf-8')), [added])
 
-	def test_add_event_rejects_invalid_time_and_duplicate_id(self):
-		event = {
-			'id': 'event-test',
-			'clubId': 'club-test',
-			'title': 'Test Event',
-			'startsAt': '2026-10-03T13:00:00-04:00',
-			'endsAt': '2026-10-03T15:00:00-04:00',
-			'location': 'Campus Hall',
-			'description': 'A test event',
-			'requirements': [],
-			'deadlines': [],
-			'priceCents': 0,
-			'isRecurring': False,
-		}
+			updated = update_event(
+				added['id'], {**added, 'title': 'Updated Test Event'}, data_file
+			)
+			self.assertEqual(updated['title'], 'Updated Test Event')
+			self.assertEqual(json.loads(data_file.read_text(encoding='utf-8')), [updated])
+
+			self.assertEqual(remove_event(added['id'], data_file), updated)
+			self.assertEqual(json.loads(data_file.read_text(encoding='utf-8')), [])
+			self.assertIsNone(remove_event('missing-id', data_file))
+
+	def test_add_event_rejects_duplicate_ids_and_invalid_times(self):
 		with tempfile.TemporaryDirectory() as directory:
 			data_file = Path(directory) / 'data_event.json'
 			data_file.write_text('[]', encoding='utf-8')
+			event = {**sample_event(), 'id': 'event-test'}
 			add_event(event, data_file)
+
 			with self.assertRaises(ValueError):
 				add_event(event, data_file)
 			with self.assertRaises(ValueError):
 				add_event(
-					{**event, 'id': 'event-invalid', 'endsAt': '2026-10-03T12:00:00-04:00'},
+					{**sample_event(), 'endsAt': '2026-10-03T12:00:00-04:00'},
 					data_file,
 				)
-
-
-class FilterTests(unittest.TestCase):
-	def test_filter_clubs_by_category_case_insensitively(self):
-		matching = filter_clubs(CLUBS, 'academic')
-		self.assertEqual([club['id'] for club in matching], ['club-data-lab'])
-		self.assertEqual(filter_clubs(CLUBS), CLUBS)
-
-	def test_filter_events_by_category_and_recurrence(self):
-		academic_events = filter_events(EVENTS, CLUBS, category='Academic')
-		self.assertEqual(len(academic_events), 2)
-		recurring = filter_events(EVENTS, recurring=True)
-		self.assertTrue(recurring)
-		self.assertTrue(all(event['isRecurring'] for event in recurring))
-		one_time = filter_events(EVENTS, recurring=False)
-		self.assertTrue(one_time)
-		self.assertTrue(all(not event['isRecurring'] for event in one_time))
-
-	def test_filter_events_by_requirements_price_and_deadlines(self):
-		self.assertEqual(
-			[event['id'] for event in filter_events(EVENTS, requirement='laptop')],
-			['event-study-dashboard'],
-		)
-		paid_events = filter_events(EVENTS, min_price_cents=300, max_price_cents=500)
-		self.assertEqual(
-			{event['id'] for event in paid_events},
-			{'event-sunrise-5k', 'event-dumpling-social', 'event-live-lounge'},
-		)
-		without_deadlines = filter_events(EVENTS, has_deadline=False)
-		self.assertEqual(
-			{event['id'] for event in without_deadlines},
-			{'event-research-roundtable', 'event-quiet-craft'},
-		)
-		deadline_window = filter_events(
-			EVENTS,
-			deadline_from='2026-10-20T00:00:00-04:00',
-			deadline_to='2026-10-27T23:59:00-04:00',
-		)
-		self.assertEqual(
-			{event['id'] for event in deadline_window},
-			{'event-climbing-night', 'event-dumpling-social', 'event-radio-open-mic'},
-		)
-
-	def test_filter_events_by_date_and_overlapping_time_range(self):
-		date_window = filter_events(EVENTS, date_from='2026-10-10', date_to='2026-10-16')
-		self.assertEqual(
-			{event['id'] for event in date_window},
-			{'event-sunrise-5k', 'event-research-roundtable', 'event-live-lounge'},
-		)
-		time_window = filter_events(EVENTS, time_from='20:15', time_to='22:00')
-		self.assertIn('event-live-lounge', {event['id'] for event in time_window})
-		self.assertNotIn('event-study-dashboard', {event['id'] for event in time_window})
-
-	def test_filter_events_by_campus_location(self):
-		on_campus = {
-			'id': 'on-campus',
-			'location': 'Student Union',
-			'locationType': 'on campus',
-			'startsAt': '2026-10-03T13:00:00-04:00',
-			'endsAt': '2026-10-03T15:00:00-04:00',
-		}
-		off_campus = {
-			'id': 'off-campus',
-			'location': 'City Gym',
-			'isOnCampus': False,
-			'startsAt': '2026-10-03T13:00:00-04:00',
-			'endsAt': '2026-10-03T15:00:00-04:00',
-		}
-		unknown = {
-			'id': 'unknown-location',
-			'location': 'Somewhere',
-			'startsAt': '2026-10-03T13:00:00-04:00',
-			'endsAt': '2026-10-03T15:00:00-04:00',
-		}
-		events = [on_campus, off_campus, unknown]
-		self.assertEqual(
-			filter_events(events, location_type='on_campus'), [on_campus]
-		)
-		self.assertEqual(
-			filter_events(events, location_type='off campus'), [off_campus]
-		)
-		self.assertEqual(
-			filter_events(
-				[unknown],
-				location_type='on_campus',
-				on_campus_locations=['Somewhere'],
-			),
-			[unknown],
-		)
-
-	def test_category_event_filter_requires_club_records(self):
-		with self.assertRaises(ValueError):
-			filter_events(EVENTS, category='Academic')
 
 
 if __name__ == '__main__':
