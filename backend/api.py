@@ -50,6 +50,60 @@ def get_events():
 	return jsonify([_to_calendar_event(event) for event in events])
 
 
+@app.route('/api/search', methods=['GET'])
+def search():
+	query = request.args.get('q', '').strip().casefold()
+	if not query:
+		return jsonify(error="A non-empty 'q' search term is required"), 400
+
+	club_data = _read_json(CLUBS_FILE)
+	clubs = club_data.get('clubs') if isinstance(club_data, dict) else None
+	events = _read_json(EVENTS_FILE)
+	if not isinstance(clubs, list) or not isinstance(events, list):
+		return jsonify(error='Could not load clubs or events'), 500
+
+	clubs_by_id = {club.get('id'): club for club in clubs}
+	matching_clubs = [club for club in clubs if _club_matches(club, query)]
+	matching_events = [
+		_to_calendar_event(event)
+		for event in events
+		if _event_matches(event, query, clubs_by_id.get(event.get('clubId')))
+	]
+	return jsonify(clubs=matching_clubs, events=matching_events)
+
+
+def _club_matches(club, query):
+	social_details = ' '.join(
+		f"{social.get('platform', '')} {social.get('url', '')}"
+		for social in club.get('socials', [])
+		if isinstance(social, dict)
+	)
+	return _contains_query(query, club.get('name'), club.get('category'), social_details)
+
+
+def _event_matches(event, query, club):
+	requirements = ' '.join(event.get('requirements', []))
+	deadline_labels = ' '.join(
+		deadline.get('label', '')
+		for deadline in event.get('deadlines', [])
+		if isinstance(deadline, dict)
+	)
+	club_name = club.get('name') if isinstance(club, dict) else None
+	return _contains_query(
+		query,
+		event.get('title'),
+		event.get('description'),
+		event.get('location'),
+		requirements,
+		deadline_labels,
+		club_name,
+	)
+
+
+def _contains_query(query, *values):
+	return any(query in value.casefold() for value in values if isinstance(value, str))
+
+
 def _to_calendar_event(event):
 	return {
 		'id': event['id'],
