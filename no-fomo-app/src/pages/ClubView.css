@@ -1,0 +1,77 @@
+.club-view {
+  min-height: 100vh;
+  padding: 32px;
+  background: #f4f6fa;
+  color: #172033;
+  font-family: Arial, sans-serif;
+}
+
+.club-view,
+.club-view * {
+  box-sizing: border-box;
+}
+
+.club-view__header {
+  max-width: 1400px;
+  margin: 0 auto 28px;
+}
+
+.club-view__header h1 {
+  margin: 0 0 8px;
+}
+
+.club-view__header p {
+  margin: 0;
+}
+
+.club-view__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+  gap: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.club-view__calendar {
+  min-width: 0;
+  padding: 24px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+}
+
+.club-view__calendar h2 {
+  margin: 0 0 24px;
+}
+
+.club-view__form {
+  min-width: 0;
+}
+
+/* Override the standalone form's earlier margin and width. */
+.club-view__form .add-event-form {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+/* Stack the sections on smaller screens. */
+@media (max-width: 900px) {
+  .club-view {
+    padding: 16px;
+  }
+
+  .club-view__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .club-view__calendar {
+    padding: 16px;
+  }
+
+  .club-view__calendar .fc-header-toolbar {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}

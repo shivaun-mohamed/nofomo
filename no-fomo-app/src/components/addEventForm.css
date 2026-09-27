@@ -2,8 +2,126 @@
   max-width: 600px;
   margin: 24px auto;
   padding: 24px;
-  background: white;
-  color: #172033;
-  border: 1px solid #ddd;
-  border-radius: 12px;
+  color: #23332c;
+  background: #fff;
+  border: 1px solid #dce4de;
+  border-radius: 6px;
+}
+
+.add-event-form h2 {
+  margin: 0;
+  color: #23332c;
+  font-family: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+  font-size: 26px;
+  font-weight: 500;
+}
+
+.add-event-form__intro {
+  margin: 7px 0 20px;
+  color: #69776f;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.add-event-form__fields {
+  display: grid;
+  gap: 15px;
+}
+
+.add-event-form__field {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+  color: #46564c;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.add-event-form__field input,
+.add-event-form__field select,
+.add-event-form__field textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 9px 10px;
+  border: 1px solid #d4ded7;
+  border-radius: 4px;
+  color: #23332c;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.add-event-form__field textarea {
+  min-height: 74px;
+  resize: vertical;
+}
+
+.add-event-form__field input:focus,
+.add-event-form__field select:focus,
+.add-event-form__field textarea:focus {
+  border-color: #286448;
+  outline: 2px solid #286448;
+  outline-offset: 1px;
+}
+
+.add-event-form__field input::placeholder,
+.add-event-form__field textarea::placeholder {
+  color: #89958d;
+}
+
+.add-event-form__field-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.add-event-form__optional {
+  color: #89958d;
+  font-weight: 400;
+}
+
+.add-event-form__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #46564c;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.add-event-form__checkbox input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #286448;
+}
+
+.add-event-form__error,
+.add-event-form__message {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.add-event-form__error { color: #a34432; }
+.add-event-form__message { color: #286448; }
+
+.add-event-form__submit {
+  min-height: 43px;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 4px;
+  color: #fff;
+  background: #286448;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.add-event-form__submit:hover { background: #1e5038; }
+
+@media (max-width: 520px) {
+  .add-event-form { padding: 18px; }
+  .add-event-form__field-grid { grid-template-columns: minmax(0, 1fr); }
 }
