@@ -65,6 +65,7 @@ function FilterChoices({ title, group, options, filters, toggleFilter }) {
 function App() {
   const [page, setPage] = useState("home");
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState({ clubs: [], events: [] });
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ clubs: [], categories: [], maxCost: 0, hasDeadline: false, foodSnacksOnly: false, recurrence: "all" });
@@ -150,9 +151,20 @@ function App() {
     extendedProps: { ...event, clubName: club?.name || "Unknown club", category: club?.category || "Other" },
   };
   });
+  const normalizedSearch = searchTerm.trim().toLocaleLowerCase();
   const visibleEvents = calendarEvents.filter((event) => {
     const details = event.extendedProps;
-    return (!filters.clubs.length || filters.clubs.includes(details.clubId))
+    const searchableText = [
+      event.title,
+      details.description,
+      details.location,
+      details.clubName,
+      ...(details.requirements || []),
+      ...(details.deadlines || []).map((deadline) => deadline.label),
+    ].filter(Boolean).join(" ").toLocaleLowerCase();
+
+    return (!normalizedSearch || searchableText.includes(normalizedSearch))
+      && (!filters.clubs.length || filters.clubs.includes(details.clubId))
       && (!filters.categories.length || filters.categories.includes(details.category))
       && ((details.priceCents || 0) <= filters.maxCost * 100)
       && (!filters.hasDeadline || (details.deadlines || []).length > 0)
@@ -232,6 +244,15 @@ function App() {
               <button className="clear-filters" onClick={() => setFilters({ clubs: [], categories: [], maxCost: maxEventCost, hasDeadline: false, foodSnacksOnly: false, recurrence: "all" })}>Clear</button>
             </div>
             <p className="filter-count">{visibleEvents.length} of {calendarEvents.length} events</p>
+            <label className="event-search">
+              <span>Search events and clubs</span>
+              <input
+                type="search"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                placeholder="Title, club, location..."
+              />
+            </label>
             <FilterChoices title="Clubs" group="clubs" options={clubs.map((club) => ({ value: club.id, label: club.name }))} filters={filters} toggleFilter={toggleFilter} />
             <FilterChoices title="Categories" group="categories" options={CATEGORIES.map((category) => ({ value: category, label: category }))} filters={filters} toggleFilter={toggleFilter} />
             <fieldset className="filter-group">
@@ -252,6 +273,11 @@ function App() {
           </aside>
           <div className="calendar-card">
             {loading && <p role="status">Loading clubs and events...</p>}
+            {!loading && visibleEvents.length === 0 && (
+              <p className="no-events-message" role="status">
+                No events match your search and filters.
+              </p>
+            )}
             <FullCalendar
               plugins={[themePlugin, dayGridPlugin]}
               initialView="dayGridMonth"
