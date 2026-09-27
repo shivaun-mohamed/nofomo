@@ -53,7 +53,12 @@ function App() {
             }}
           />
         </div>
-        {selectedEvent && <EventModal event={selectedEvent} />}
+        {selectedEvent && (
+          <EventModal
+            event={selectedEvent}
+            onClose={() => setSelectedEvent(null)}
+          />
+        )}
       </section>
       {/* <AddEventForm /> */}
     </main>
