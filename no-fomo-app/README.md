@@ -1,68 +1,94 @@
-Problem Statement: There are so many clubs at ubc, each with their own instagram account that you have to follow, it becomes very difficult for students to track all these events and accounts, and as a result they miss out on a lot of events that they would have liked to attend
-“Tired of getting FOMO? That’s not going to happen NOMO”
+# NOMO
 
-Solution: 
-MVP - Build a calendar platform and central event field with student-side and club-side
-A centralized UBC event calendar where clubs publish events and students discover them through search and filters.
-We need a website for the calendar
-https://fullcalendar.io/docs/react 
-We need a list of events and clubs
-Event:
-Title
-Date and Time
-Location
-Description
-Requirements:
-Deadlines:
-Price 
-Recurring or one time
-Club:
-Name:
-Category:
-Academic
-Athletic or Recreation
-Cultural or Identity
-Grassroots or Political
-Leisure or Hobby
-Media or Performance
-Other
-Instagram or socials
-- 	Filtering by recurring events, and one-time events
-We need the calendar to render the events
+**A little less scrolling. A lot more showing up.**
 
-User Flow:
-Students navigate to the website - normal login first - stretch
-One-time preferences page
-Then, they see a calender
-search bar for club or (stretch* event name), 
-a calendar for only that club, and maybe profile
-filtering toolbar
-category of event
-date - uses calendar navigation
-Free events
-Recurring or one-time
-Clicking on an event opens a popup with their information
-can link to the clubs instagram or socials
+NOMO brings UBC club events together in one calendar. Students can browse and filter events, while clubs can share upcoming events through a simple dashboard.
 
+## The problem
 
+Campus events are often scattered across club social media accounts. Students can miss events they would enjoy because they have to find and follow many separate accounts.
 
+## What NOMO does
 
-Student side
-View calendar
-View upcoming events
-Search events/clubs
-Filter events
-Click event → event details
-Click club → club page
-Link to club's Instagram/socials
+- Shows club events in a monthly calendar.
+- Lets students search events and filter by club, category, price, deadlines, food, and recurrence.
+- Opens event details, including time, location, cost, requirements, deadlines, and club information.
+- Provides an **Add to Google Calendar** link that opens Google Calendar with an event pre-filled for the user to review and save.
+- Gives clubs a dashboard to view their calendar and submit events.
 
+## How it works
 
+The frontend is built with React and Vite. FullCalendar displays events in the browser. The Flask backend provides API routes for clubs, events, search, and event creation or deletion. In the current local setup, the API reads and writes JSON files in `backend/`.
 
+When a club submits an event, the frontend sends its details to Flask. The backend validates the event and verifies its club, then saves it. The frontend reloads the data so the event appears in the calendar.
 
+The Google Calendar action is a pre-filled link generated in the browser. NOMO does not sign in to Google or automatically sync calendars.
 
-Club side
-Club creates an account
-Club creates an event
-Club edits/deletes its events
-Club has a profile
-Club's events automatically appear on the calendar
+## Run locally
+
+You need Python and Node.js/npm installed. Start the backend and frontend in separate terminals.
+
+### 1. Start the Flask API
+
+From the repository root:
+
+```powershell
+cd backend
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+py api.py
+```
+
+The API runs at `http://127.0.0.1:5000`.
+
+### 2. Start the frontend
+
+In a second terminal, from the repository root:
+
+```powershell
+cd no-fomo-app
+npm install
+npm run dev
+```
+
+Open the local URL printed by Vite (usually `http://localhost:5173`). Vite forwards `/api` requests to the Flask server.
+
+## API overview
+
+| Method | Route | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/clubs` | List clubs |
+| `GET` | `/api/events` | List events in calendar format |
+| `GET` | `/api/search?q=term` | Search clubs and events |
+| `POST` | `/api/events` | Validate and create an event |
+| `PUT` | `/api/events/<event_id>` | Update an event |
+| `DELETE` | `/api/events/<event_id>` | Delete an event |
+
+## Project structure
+
+```text
+backend/
+  api.py                 Flask API routes
+  edit_event.py          Event validation and JSON-file updates
+  data_club.json         Local club data
+  data_event.json        Local event data
+no-fomo-app/
+  src/App.jsx            Main page flow and student calendar
+  src/pages/ClubView.jsx Club dashboard
+  src/components/        Event submission form
+  src/components2/       Event details modal and Google Calendar link
+```
+
+## Useful commands
+
+From `no-fomo-app/`:
+
+```bash
+npm run build  # Create a production frontend build in dist/
+npm run lint   # Check frontend code with ESLint
+```
+
+## Data and deployment notes
+
+The local Flask API uses `backend/data_club.json` and `backend/data_event.json`. The repository also contains database and deployment setup files; check `backend/DEPLOYMENT.md` before deploying, and verify that its deployment instructions match the API version being deployed.
