@@ -2,10 +2,10 @@
     "clubs": [
         {
             "id": "club-data-lab",
-            "name": "Campus Data Lab",
+            "name": "UBC Biztech",
             "category": "Academic",
             "socials": [
-                {"platform": "Instagram", "url": "https://instagram.com/campusdatalab"}
+                {"platform": "Instagram", "url": "https://www.instagram.com/ubcbiztech/"}
             ]
         },
         {

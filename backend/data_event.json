@@ -1,27 +1,5 @@
 [
   {
-    "id": "event-study-dashboard",
-    "clubId": "club-data-lab",
-    "title": "Build a Study Dashboard",
-    "startsAt": "2026-10-03T13:00:00-04:00",
-    "endsAt": "2026-10-03T15:00:00-04:00",
-    "location": "Innovation Hall, Room 204",
-    "description": "A beginner-friendly workshop to turn a small dataset into a useful study dashboard.",
-    "requirements": [
-      "Bring a laptop",
-      "No coding experience needed"
-    ],
-    "deadlines": [
-      {
-        "label": "Registration closes",
-        "dateTime": "2026-10-02T17:00:00-04:00"
-      }
-    ],
-    "priceCents": 0,
-    "isRecurring": false,
-    "foodSnacksIncluded": false
-  },
-  {
     "id": "event-research-roundtable",
     "clubId": "club-data-lab",
     "title": "Peer Research Roundtable",
@@ -226,20 +204,6 @@
     "id": "3adfa2c6-1e67-4d55-9f17-f59810102be9"
   },
   {
-    "clubId": "club-global-kitchen",
-    "title": "ice cream night",
-    "startsAt": "2026-10-06T03:48:00.000Z",
-    "endsAt": "2026-10-06T05:49:00.000Z",
-    "location": "LIFE 2201",
-    "description": "ice cream",
-    "requirements": [],
-    "deadlines": [],
-    "priceCents": 0,
-    "isRecurring": false,
-    "foodSnacksIncluded": false,
-    "id": "a1b853f3-95c7-41fd-849b-9ce543594dbd"
-  },
-  {
     "clubId": "club-makers-menders",
     "title": "Ice cream day",
     "startsAt": "2026-10-09T16:23:00.000Z",
@@ -252,24 +216,5 @@
     "isRecurring": false,
     "foodSnacksIncluded": false,
     "id": "06ffdecd-c5d2-44c9-aa33-7579272cccbc"
-  },
-  {
-    "clubId": "club-data-lab",
-    "title": "cool event",
-    "startsAt": "2026-10-07T17:24:00.000Z",
-    "endsAt": "2026-10-08T05:24:00.000Z",
-    "location": "cool event",
-    "description": "cool event",
-    "requirements": [],
-    "deadlines": [
-      {
-        "label": "Registration closes",
-        "dateTime": "2026-09-27T04:27:00.000Z"
-      }
-    ],
-    "priceCents": 1,
-    "isRecurring": false,
-    "foodSnacksIncluded": false,
-    "id": "92490414-afac-447f-88df-ac590fab794a"
   }
 ]
