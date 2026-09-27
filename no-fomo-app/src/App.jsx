@@ -110,9 +110,18 @@ function App() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(event),
     });
-    const result = await response.json();
+    const responseText = await response.text();
+    let result = null;
+    try {
+      result = responseText ? JSON.parse(responseText) : null;
+    } catch {
+      // Surface a useful backend/proxy error below instead of a JSON parse error.
+    }
     if (!response.ok) {
-      throw new Error(result.error || "Could not save the event.");
+      throw new Error(result?.error || `The backend returned HTTP ${response.status}. Make sure Flask is running and the frontend proxy points to it.`);
+    }
+    if (!result) {
+      throw new Error("The backend returned an empty or invalid JSON response. Check that Flask is running.");
     }
 
     const nextData = await fetchBackendData();
