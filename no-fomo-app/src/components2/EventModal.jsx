@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "./EventModal.css";
 
 function formatDateTime(dateTime) {
@@ -17,7 +18,9 @@ function toGoogleCalendarDate(dateTime) {
   return new Date(dateTime).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 }
 
-function EventModal({ event, clubs, onClose }) {
+function EventModal({ event, clubs = [], onClose, onRemoveEvent }) {
+  const [removeError, setRemoveError] = useState("");
+  const [isRemoving, setIsRemoving] = useState(false);
   const club = clubs.find((item) => event.clubId === item.id);
   const requirements = event.requirements || [];
   const deadlines = event.deadlines || [];
@@ -40,6 +43,18 @@ function EventModal({ event, clubs, onClose }) {
     details: eventDetails.join("\n\n"),
     location: event.location || "",
   }).toString()}`;
+
+  async function handleRemoveEvent() {
+    setIsRemoving(true);
+    setRemoveError("");
+    try {
+      await onRemoveEvent(event.id);
+      onClose();
+    } catch (error) {
+      setRemoveError(error.message || "Could not remove the event.");
+      setIsRemoving(false);
+    }
+  }
 
   return (
     <div className="modal-overlay">
@@ -84,6 +99,11 @@ function EventModal({ event, clubs, onClose }) {
         )}
 
         <div className="modal-actions">
+          {onRemoveEvent && (
+            <button className="remove-event-button" onClick={handleRemoveEvent} disabled={isRemoving}>
+              {isRemoving ? "Removing…" : "Remove event"}
+            </button>
+          )}
           <a className="google-calendar-link" href={googleCalendarUrl} target="_blank" rel="noreferrer">
             Add to Google Calendar
           </a>
@@ -94,6 +114,7 @@ function EventModal({ event, clubs, onClose }) {
           )}
           <button onClick={onClose}>Close</button>
         </div>
+        {removeError && <p className="remove-event-error" role="alert">{removeError}</p>}
       </div>
     </div>
   );

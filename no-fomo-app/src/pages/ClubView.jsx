@@ -7,10 +7,12 @@ import "@fullcalendar/react/skeleton.css";
 import "@fullcalendar/react/themes/monarch/theme.css";
 
 import AddEventForm from "../components/AddEventForm";
+import EventModal from "../components2/EventModal";
 import "./ClubView.css";
 
-function ClubView({ clubs, events, onAddEvent, onGoHome }) {
+function ClubView({ clubs, events, onAddEvent, onRemoveEvent, onGoHome }) {
   const [selectedClubId, setSelectedClubId] = useState("");
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const activeClubId = clubs.some((club) => club.id === selectedClubId)
     ? selectedClubId
     : clubs[0]?.id || "";
@@ -55,6 +57,10 @@ function ClubView({ clubs, events, onAddEvent, onGoHome }) {
             fixedWeekCount={false}
             dayMaxEvents={2}
             events={calendarEvents}
+            eventClick={(info) => {
+              const clickedEvent = events.find((event) => event.id === info.event.id);
+              if (clickedEvent) setSelectedEvent(clickedEvent);
+            }}
           />
         </section>
 
@@ -67,6 +73,14 @@ function ClubView({ clubs, events, onAddEvent, onGoHome }) {
           />
         </div>
       </div>
+      {selectedEvent && (
+        <EventModal
+          event={selectedEvent}
+          clubs={clubs}
+          onClose={() => setSelectedEvent(null)}
+          onRemoveEvent={onRemoveEvent}
+        />
+      )}
     </main>
   );
 }
