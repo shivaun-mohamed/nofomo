@@ -5,6 +5,7 @@ import dayGridPlugin from "@fullcalendar/react/daygrid";
 import "@fullcalendar/react/skeleton.css";
 import "@fullcalendar/react/themes/monarch/theme.css";
 import "./App.css";
+import fallbackData from "./data/data.json";
 import EventModal from "./components2/EventModal";
 import ClubView from "./pages/ClubView";
 
@@ -38,7 +39,7 @@ function App() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [data, setData] = useState({ clubs: [], events: [] });
   const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState("");
+  const [loadNotice, setLoadNotice] = useState("");
   const [filters, setFilters] = useState({ clubs: [], categories: [], maxCost: 0, hasDeadline: false, foodSnacksOnly: false, recurrence: "all" });
 
   useEffect(() => {
@@ -47,8 +48,8 @@ function App() {
     async function loadData() {
       try {
         const [clubsResponse, eventsResponse] = await Promise.all([
-          fetch("http://127.0.0.1:5000/api/clubs"),
-          fetch("http://127.0.0.1:5000/api/events"),
+          fetch("/api/clubs"),
+          fetch("/api/events"),
         ]);
 
         if (!clubsResponse.ok || !eventsResponse.ok) {
@@ -75,7 +76,14 @@ function App() {
         );
         setFilters((current) => ({ ...current, maxCost }));
       } catch (error) {
-        if (!cancelled) setLoadError(error.message);
+        if (!cancelled) {
+          setData(fallbackData);
+          const maxCost = Math.ceil(
+            Math.max(0, ...fallbackData.events.map((event) => event.priceCents || 0)) / 100
+          );
+          setFilters((current) => ({ ...current, maxCost }));
+          setLoadNotice("Showing saved events. Start the backend to load the latest club updates.");
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -219,7 +227,7 @@ function App() {
           </aside>
           <div className="calendar-card">
             {loading && <p role="status">Loading clubs and events...</p>}
-            {loadError && <p role="alert">{loadError}</p>}
+            {loadNotice && <p className="calendar-data-notice" role="status">{loadNotice}</p>}
             <FullCalendar
               plugins={[themePlugin, dayGridPlugin]}
               initialView="dayGridMonth"
