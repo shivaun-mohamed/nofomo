@@ -84,6 +84,26 @@
   background: #194d39;
 }
 
+.modal-actions .remove-event-button {
+  border-color: #a33f36;
+  background: #a33f36;
+}
+
+.modal-actions .remove-event-button:hover:not(:disabled) {
+  background: #842f29;
+}
+
+.modal-actions .remove-event-button:disabled {
+  cursor: wait;
+  opacity: .7;
+}
+
+.remove-event-error {
+  margin-top: 14px !important;
+  color: #a33f36 !important;
+  font-size: 13px !important;
+}
+
 .club-link {
   display: inline-block;
   padding: 10px 18px;

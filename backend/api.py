@@ -3,7 +3,7 @@ from pathlib import Path
 
 from flask import Flask, jsonify, request
 
-from edit_event import add_event, update_event
+from edit_event import add_event, remove_event, update_event
 
 
 BACKEND_DIR = Path(__file__).resolve().parent
@@ -154,6 +154,14 @@ def replace_event(event_id):
 	if updated_event is None:
 		return jsonify(error='Event not found'), 404
 	return jsonify(_to_calendar_event(updated_event))
+
+
+@app.route('/api/events/<event_id>', methods=['DELETE'])
+def delete_event(event_id):
+	deleted_event = remove_event(event_id, EVENTS_FILE)
+	if deleted_event is None:
+		return jsonify(error='Event not found'), 404
+	return jsonify(_to_calendar_event(deleted_event))
 
 
 if __name__ == '__main__':

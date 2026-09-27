@@ -120,6 +120,18 @@ function App() {
     setFilters((current) => ({ ...current, maxCost: getMaxEventCost(nextData.events) }));
   }
 
+  async function removeEvent(eventId) {
+    const response = await fetch(`/api/events/${encodeURIComponent(eventId)}`, { method: "DELETE" });
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error || "Could not remove the event.");
+    }
+
+    const nextData = await fetchBackendData();
+    setData(nextData);
+    setFilters((current) => ({ ...current, maxCost: getMaxEventCost(nextData.events) }));
+  }
+
   const maxEventCost = Math.ceil(
     Math.max(0, ...data.events.map((event) => event.priceCents || 0)) / 100
   );
@@ -216,6 +228,7 @@ function App() {
         clubs={clubs}
         events={data.events}
         onAddEvent={createEvent}
+        onRemoveEvent={removeEvent}
         onGoHome={() => setPage("home")}
       />
     );
