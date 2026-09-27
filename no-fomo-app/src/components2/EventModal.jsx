@@ -14,8 +14,12 @@ function formatDateTime(dateTime) {
   });
 }
 
+function toGoogleCalendarDate(dateTime) {
+  return new Date(dateTime).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+}
+
 function EventModal({ event, onClose }) {
-  const club = data.clubs.find((club) => event.clubId === club.id);
+  const club = data.clubs.find((item) => event.clubId === item.id);
   const requirements = event.requirements || [];
   const deadlines = event.deadlines || [];
   const price = Number.isFinite(event.priceCents)
@@ -24,6 +28,15 @@ function EventModal({ event, onClose }) {
         currency: "CAD",
       }).format(event.priceCents / 100)
     : "Not provided";
+  const eventDetails = [event.description || "No description provided.", `Hosted by: ${club?.name || "UBC club"}`];
+  if (club?.socials?.[0]?.url) eventDetails.push(`Club: ${club.socials[0].url}`);
+  const googleCalendarUrl = `https://calendar.google.com/calendar/render?${new URLSearchParams({
+    action: "TEMPLATE",
+    text: event.title,
+    dates: `${toGoogleCalendarDate(event.startsAt)}/${toGoogleCalendarDate(event.endsAt)}`,
+    details: eventDetails.join("\n\n"),
+    location: event.location || "",
+  }).toString()}`;
 
   return (
     <div className="modal-overlay">
@@ -38,6 +51,7 @@ function EventModal({ event, onClose }) {
 
         <p><strong>When:</strong> {formatDateTime(event.startsAt)} – {formatDateTime(event.endsAt)}</p>
         <p><strong>Where:</strong> {event.location || "Not provided"}</p>
+        <p><strong>Hosted by:</strong> {club?.name || "UBC club"}</p>
         <p><strong>Cost:</strong> {price}</p>
         <p><strong>Recurring:</strong> {event.isRecurring ? "Yes" : "No"}</p>
 
@@ -64,18 +78,18 @@ function EventModal({ event, onClose }) {
         ) : (
           <p>No deadlines listed.</p>
         )}
-        <a
-  className="club-link"
-  href={club.socials[0].url}
-  target="_blank"
-  rel="noreferrer"
->
-  Visit Club Page
-</a>
 
-<p>{club.url}</p>
-
-        <button onClick={onClose}>Close</button>
+        <div className="modal-actions">
+          <a className="google-calendar-link" href={googleCalendarUrl} target="_blank" rel="noreferrer">
+            Add to Google Calendar
+          </a>
+          {club?.socials?.[0]?.url && (
+            <a className="club-link" href={club.socials[0].url} target="_blank" rel="noreferrer">
+              Visit Club Page
+            </a>
+          )}
+          <button onClick={onClose}>Close</button>
+        </div>
       </div>
     </div>
   );
