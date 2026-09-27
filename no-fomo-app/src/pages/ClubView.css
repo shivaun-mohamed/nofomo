@@ -12,8 +12,15 @@
 }
 
 .club-view__header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
   max-width: 1400px;
   margin: 0 auto 28px;
+}
+
+.club-view__header .brand-logo {
+  width: 128px;
 }
 
 .club-view__header h1 {

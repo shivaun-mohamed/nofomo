@@ -31,6 +31,7 @@ def sample_event():
 		'deadlines': [{'label': 'Register', 'dateTime': '2026-10-02T17:00:00-04:00'}],
 		'priceCents': 500,
 		'isRecurring': False,
+		'foodSnacksIncluded': False,
 	}
 
 
@@ -46,7 +47,7 @@ class BackendDataTests(unittest.TestCase):
 				{
 					'id', 'clubId', 'title', 'startsAt', 'endsAt', 'location',
 					'description', 'requirements', 'deadlines', 'priceCents',
-					'isRecurring',
+					'isRecurring', 'foodSnacksIncluded',
 				}.issubset(event)
 				for event in EVENTS
 			)

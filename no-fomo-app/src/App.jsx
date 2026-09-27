@@ -38,7 +38,7 @@ function App() {
   const [page, setPage] = useState("home");
   const [authMessage, setAuthMessage] = useState("");
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [filters, setFilters] = useState({ clubs: [], categories: [], maxCost: MAX_EVENT_COST, hasDeadline: false, recurrence: "all" });
+  const [filters, setFilters] = useState({ clubs: [], categories: [], maxCost: MAX_EVENT_COST, hasDeadline: false, foodSnacksOnly: false, recurrence: "all" });
   const clubs = data.clubs;
   const clubById = Object.fromEntries(clubs.map((club) => [club.id, club]));
   const calendarEvents = data.events.map((event) => {
@@ -57,6 +57,7 @@ function App() {
       && (!filters.categories.length || filters.categories.includes(details.category))
       && ((details.priceCents || 0) <= filters.maxCost * 100)
       && (!filters.hasDeadline || (details.deadlines || []).length > 0)
+      && (!filters.foodSnacksOnly || details.foodSnacksIncluded === true)
       && (filters.recurrence === "all" || (filters.recurrence === "recurring" ? details.isRecurring : !details.isRecurring));
   });
   const toggleFilter = (group, value) => setFilters((current) => ({
@@ -126,7 +127,7 @@ function App() {
   }
 
   if (page === "club") {
-  return <ClubView />;
+  return <ClubView onGoHome={() => setPage("home")} />;
 }
 
   return (
@@ -144,7 +145,7 @@ function App() {
           <aside className="filter-sidebar" aria-label="Filter events">
             <div className="filter-heading">
               <div><p className="eyebrow">MAKE IT YOURS</p><h2>Filters</h2></div>
-              <button className="clear-filters" onClick={() => setFilters({ clubs: [], categories: [], maxCost: MAX_EVENT_COST, hasDeadline: false, recurrence: "all" })}>Clear</button>
+              <button className="clear-filters" onClick={() => setFilters({ clubs: [], categories: [], maxCost: MAX_EVENT_COST, hasDeadline: false, foodSnacksOnly: false, recurrence: "all" })}>Clear</button>
             </div>
             <p className="filter-count">{visibleEvents.length} of {calendarEvents.length} events</p>
             <FilterChoices title="Clubs" group="clubs" options={clubs.map((club) => ({ value: club.id, label: club.name }))} filters={filters} toggleFilter={toggleFilter} />
@@ -158,6 +159,7 @@ function App() {
             <fieldset className="filter-group">
               <legend>Event type</legend>
               <label className="filter-option"><input type="checkbox" checked={filters.hasDeadline} onChange={(event) => setFilters((current) => ({ ...current, hasDeadline: event.target.checked }))} /><span>Has a deadline</span></label>
+              <label className="filter-option"><input type="checkbox" checked={filters.foodSnacksOnly} onChange={(event) => setFilters((current) => ({ ...current, foodSnacksOnly: event.target.checked }))} /><span>Food/Snacks included</span></label>
               <label className="filter-option"><input type="radio" name="recurrence" checked={filters.recurrence === "all"} onChange={() => setFilters((current) => ({ ...current, recurrence: "all" }))} /><span>Any schedule</span></label>
               <label className="filter-option"><input type="radio" name="recurrence" checked={filters.recurrence === "recurring"} onChange={() => setFilters((current) => ({ ...current, recurrence: "recurring" }))} /><span>Recurring</span></label>
               <label className="filter-option"><input type="radio" name="recurrence" checked={filters.recurrence === "one-time"} onChange={() => setFilters((current) => ({ ...current, recurrence: "one-time" }))} /><span>One-time</span></label>

@@ -76,7 +76,9 @@
         }
       ],
       "priceCents": 0,
-      "isRecurring": false
+      "isRecurring": false,
+
+      "foodSnacksIncluded": false
     },
     {
       "id": "event-research-roundtable",
@@ -91,7 +93,9 @@
       ],
       "deadlines": [],
       "priceCents": 0,
-      "isRecurring": true
+      "isRecurring": true,
+
+      "foodSnacksIncluded": false
     },
     {
       "id": "event-sunrise-5k",
@@ -112,7 +116,9 @@
         }
       ],
       "priceCents": 300,
-      "isRecurring": false
+      "isRecurring": false,
+
+      "foodSnacksIncluded": true
     },
     {
       "id": "event-climbing-night",
@@ -133,7 +139,9 @@
         }
       ],
       "priceCents": 800,
-      "isRecurring": true
+      "isRecurring": true,
+
+      "foodSnacksIncluded": false
     },
     {
       "id": "event-stories-table",
@@ -154,7 +162,9 @@
         }
       ],
       "priceCents": 0,
-      "isRecurring": false
+      "isRecurring": false,
+
+      "foodSnacksIncluded": false
     },
     {
       "id": "event-dumpling-social",
@@ -175,7 +185,9 @@
         }
       ],
       "priceCents": 500,
-      "isRecurring": false
+      "isRecurring": false,
+
+      "foodSnacksIncluded": true
     },
     {
       "id": "event-visible-mending",
@@ -196,7 +208,9 @@
         }
       ],
       "priceCents": 200,
-      "isRecurring": false
+      "isRecurring": false,
+
+      "foodSnacksIncluded": false
     },
     {
       "id": "event-quiet-craft",
@@ -211,7 +225,9 @@
       ],
       "deadlines": [],
       "priceCents": 0,
-      "isRecurring": true
+      "isRecurring": true,
+
+      "foodSnacksIncluded": false
     },
     {
       "id": "event-live-lounge",
@@ -231,7 +247,9 @@
         }
       ],
       "priceCents": 400,
-      "isRecurring": false
+      "isRecurring": false,
+
+      "foodSnacksIncluded": false
     },
     {
       "id": "event-radio-open-mic",
@@ -252,7 +270,9 @@
         }
       ],
       "priceCents": 0,
-      "isRecurring": true
+      "isRecurring": true,
+
+      "foodSnacksIncluded": false
     }
   ]
 }

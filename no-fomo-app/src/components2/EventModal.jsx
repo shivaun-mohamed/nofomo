@@ -28,7 +28,11 @@ function EventModal({ event, onClose }) {
         currency: "CAD",
       }).format(event.priceCents / 100)
     : "Not provided";
-  const eventDetails = [event.description || "No description provided.", `Hosted by: ${club?.name || "UBC club"}`];
+  const eventDetails = [
+    event.description || "No description provided.",
+    `Hosted by: ${club?.name || "UBC club"}`,
+    `Food/Snacks included: ${event.foodSnacksIncluded ? "Yes" : "No"}`,
+  ];
   if (club?.socials?.[0]?.url) eventDetails.push(`Club: ${club.socials[0].url}`);
   const googleCalendarUrl = `https://calendar.google.com/calendar/render?${new URLSearchParams({
     action: "TEMPLATE",
@@ -53,6 +57,7 @@ function EventModal({ event, onClose }) {
         <p><strong>Where:</strong> {event.location || "Not provided"}</p>
         <p><strong>Hosted by:</strong> {club?.name || "UBC club"}</p>
         <p><strong>Cost:</strong> {price}</p>
+        <p><strong>Food/Snacks included:</strong> {event.foodSnacksIncluded ? "Yes" : "No"}</p>
         <p><strong>Recurring:</strong> {event.isRecurring ? "Yes" : "No"}</p>
 
         <p><strong>What to bring or know:</strong></p>

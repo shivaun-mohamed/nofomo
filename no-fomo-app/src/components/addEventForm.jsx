@@ -52,6 +52,7 @@ function AddEventForm({ onAddEvent }) {
         : [],
       priceCents: Math.round(Number(formData.get("price")) * 100),
       isRecurring: formData.has("isRecurring"),
+      foodSnacksIncluded: formData.has("foodSnacksIncluded"),
     };
 
     onAddEvent(event);
@@ -117,6 +118,11 @@ function AddEventForm({ onAddEvent }) {
         <label className="add-event-form__checkbox">
           <input name="isRecurring" type="checkbox" />
           <span>Recurring event</span>
+        </label>
+
+        <label className="add-event-form__checkbox">
+          <input name="foodSnacksIncluded" type="checkbox" />
+          <span>Food/Snacks included</span>
         </label>
 
         {error && <p className="add-event-form__error" role="alert">{error}</p>}

@@ -9,7 +9,7 @@ import "@fullcalendar/react/themes/monarch/theme.css";
 import AddEventForm from "../components/AddEventForm";
 import "./ClubView.css";
 
-function ClubView() {
+function ClubView({ onGoHome }) {
   const [events, setEvents] = useState([]);
   const calendarEvents = events.map((event) => ({
     id: event.id,
@@ -21,8 +21,13 @@ function ClubView() {
   return (
     <main className="club-view">
       <header className="club-view__header">
+        <button className="logo-home-button" onClick={onGoHome} aria-label="Go to home page">
+          <img className="brand-logo" src="/nomo-logo.svg" alt="nomo." />
+        </button>
+        <div className="club-view__heading">
         <h1>Club dashboard</h1>
         <p>View your club’s schedule and add upcoming events.</p>
+        </div>
       </header>
 
       <div className="club-view__layout">

@@ -43,6 +43,7 @@ def _prepare_event(event, event_id=None):
 		raise ValueError(f'Missing required event fields: {missing}')
 
 	new_event = dict(event)
+	new_event.setdefault('foodSnacksIncluded', False)
 	if event_id is None:
 		new_event.setdefault('id', str(uuid4()))
 	elif new_event.get('id', event_id) != event_id:
@@ -70,6 +71,8 @@ def _prepare_event(event, event_id=None):
 		raise ValueError('Event priceCents must be a non-negative integer')
 	if not isinstance(new_event['isRecurring'], bool):
 		raise ValueError('Event isRecurring must be a boolean')
+	if not isinstance(new_event['foodSnacksIncluded'], bool):
+		raise ValueError('Event foodSnacksIncluded must be a boolean')
 
 	try:
 		starts_at = datetime.fromisoformat(new_event['startsAt'].replace('Z', '+00:00'))
