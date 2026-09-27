@@ -68,7 +68,7 @@ function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState({ clubs: [], events: [] });
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ clubs: [], categories: [], maxCost: 0, hasDeadline: false, foodSnacksOnly: false, recurrence: "all" });
+  const [filters, setFilters] = useState({ categories: [], maxCost: 0, hasDeadline: false, foodSnacksOnly: false, recurrence: "all" });
 
   useEffect(() => {
     let cancelled = false;
@@ -164,7 +164,6 @@ function App() {
     ].filter(Boolean).join(" ").toLocaleLowerCase();
 
     return (!normalizedSearch || searchableText.includes(normalizedSearch))
-      && (!filters.clubs.length || filters.clubs.includes(details.clubId))
       && (!filters.categories.length || filters.categories.includes(details.category))
       && ((details.priceCents || 0) <= filters.maxCost * 100)
       && (!filters.hasDeadline || (details.deadlines || []).length > 0)
@@ -241,7 +240,7 @@ function App() {
           <aside className="filter-sidebar" aria-label="Filter events">
             <div className="filter-heading">
               <div><p className="eyebrow">MAKE IT YOURS</p><h2>Filters</h2></div>
-              <button className="clear-filters" onClick={() => setFilters({ clubs: [], categories: [], maxCost: maxEventCost, hasDeadline: false, foodSnacksOnly: false, recurrence: "all" })}>Clear</button>
+              <button className="clear-filters" onClick={() => setFilters({ categories: [], maxCost: maxEventCost, hasDeadline: false, foodSnacksOnly: false, recurrence: "all" })}>Clear</button>
             </div>
             <p className="filter-count">{visibleEvents.length} of {calendarEvents.length} events</p>
             <label className="event-search">
@@ -253,7 +252,6 @@ function App() {
                 placeholder="Title, club, location..."
               />
             </label>
-            <FilterChoices title="Clubs" group="clubs" options={clubs.map((club) => ({ value: club.id, label: club.name }))} filters={filters} toggleFilter={toggleFilter} />
             <FilterChoices title="Categories" group="categories" options={CATEGORIES.map((category) => ({ value: category, label: category }))} filters={filters} toggleFilter={toggleFilter} />
             <fieldset className="filter-group">
               <legend>Entry price</legend>

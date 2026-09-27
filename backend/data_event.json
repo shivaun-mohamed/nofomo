@@ -216,5 +216,79 @@
     "isRecurring": false,
     "foodSnacksIncluded": false,
     "id": "06ffdecd-c5d2-44c9-aa33-7579272cccbc"
+  },
+  {
+    "clubId": "club-global-kitchen",
+    "title": "Ice Cream Night",
+    "startsAt": "2026-10-07T03:30:00.000Z",
+    "endsAt": "2026-10-07T06:00:00.000Z",
+    "location": "Rain or Shine",
+    "description": "Ice Cream Night !!!!",
+    "requirements": [],
+    "deadlines": [],
+    "priceCents": 0,
+    "isRecurring": false,
+    "foodSnacksIncluded": false,
+    "id": "80fa04f7-fa03-40aa-997d-9ec6027bb67d"
+  },
+  {
+    "clubId": "club-data-lab",
+    "title": "HelloHacks",
+    "startsAt": "2026-09-26T16:00:00.000Z",
+    "endsAt": "2026-09-27T23:00:00.000Z",
+    "location": "LIFE 2201",
+    "description": "Beginner-friendly hackathon!",
+    "requirements": [
+      "laptop",
+      "charger"
+    ],
+    "deadlines": [
+      {
+        "label": "Registration closes",
+        "dateTime": "2026-09-19T06:59:00.000Z"
+      }
+    ],
+    "priceCents": 1000,
+    "isRecurring": false,
+    "foodSnacksIncluded": true,
+    "id": "304a3389-20f5-4f57-b471-d31a72b632ed"
+  },
+  {
+    "clubId": "club-data-lab",
+    "title": "Welcome Back to School",
+    "startsAt": "2026-09-30T19:00:00.000Z",
+    "endsAt": "2026-09-30T21:00:00.000Z",
+    "location": "LIFE 2201",
+    "description": "Welcome Back to School social event!",
+    "requirements": [],
+    "deadlines": [
+      {
+        "label": "Registration closes",
+        "dateTime": "2026-09-28T19:00:00.000Z"
+      }
+    ],
+    "priceCents": 500,
+    "isRecurring": false,
+    "foodSnacksIncluded": true,
+    "id": "51080d54-879a-4d2a-96ee-e45141153872"
+  },
+  {
+    "clubId": "club-global-kitchen",
+    "title": "Midterm Season Wellbeing",
+    "startsAt": "2026-10-08T22:00:00.000Z",
+    "endsAt": "2026-10-08T23:00:00.000Z",
+    "location": "Rain or Shine",
+    "description": "Free ice cream :)",
+    "requirements": [],
+    "deadlines": [
+      {
+        "label": "Registration closes",
+        "dateTime": "2026-10-05T21:00:00.000Z"
+      }
+    ],
+    "priceCents": 0,
+    "isRecurring": false,
+    "foodSnacksIncluded": false,
+    "id": "754444c9-573e-44a5-9ce8-262d939bd363"
   }
 ]
